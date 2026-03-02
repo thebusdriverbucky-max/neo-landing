@@ -7,6 +7,7 @@ import ServicesEditor from './_components/ServicesEditor';
 import GalleryEditor from './_components/GalleryEditor';
 import BookingEditor from './_components/BookingEditor';
 import ContactEditor from './_components/ContactEditor';
+import MessagesManager from './_components/MessagesManager';
 
 export default async function AdminPage() {
   const content = await getSiteContent();
@@ -29,6 +30,7 @@ export default async function AdminPage() {
           <GalleryEditor initialData={content.gallery} />
           <BookingEditor initialData={content.booking} />
           <ContactEditor initialData={content.contact} />
+          <MessagesManager />
         </div>
       </main>
     </div>

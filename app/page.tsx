@@ -8,6 +8,8 @@ import BookingForm from "@/components/sections/BookingForm";
 import Contact from "@/components/sections/Contact";
 import Footer from "@/components/sections/Footer";
 
+export const dynamic = 'force-dynamic';
+
 export default async function Home() {
   const content = await getSiteContent();
 
@@ -20,7 +22,7 @@ export default async function Home() {
       <Gallery content={content.gallery} />
       <BookingForm content={content.booking} />
       <Contact content={content.contact} />
-      <Footer content={content.footer} />
+      <Footer copyright={content.meta.copyright} />
     </main>
   );
 }

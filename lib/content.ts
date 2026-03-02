@@ -4,7 +4,8 @@ const defaultContent = {
   "meta": {
     "siteName": "Business Name",
     "siteDescription": "Your business description",
-    "favicon": ""
+    "favicon": "",
+    "copyright": "© 2025 Business Name. All rights reserved."
   },
   "navbar": {
     "logo": "LOGO",
@@ -74,12 +75,21 @@ export async function getSiteContent() {
     });
   }
 
-  return content.data as any;
+  const data = content.data as any;
+
+  // Ensure meta exists and merge copyright from column if available
+  if (data.meta && content.copyright) {
+    data.meta.copyright = content.copyright;
+  } else if (data.meta && !data.meta.copyright) {
+    data.meta.copyright = defaultContent.meta.copyright;
+  }
+
+  return data;
 }
 
 export async function updateSiteContent(section: string, data: any) {
   const currentContent = await getSiteContent();
-  
+
   const updatedData = {
     ...currentContent,
     [section]: data,
@@ -89,8 +99,14 @@ export async function updateSiteContent(section: string, data: any) {
     where: { id: 1 },
     data: {
       data: updatedData,
+      ...(section === 'meta' ? { copyright: data.copyright || '' } : {}),
     },
   });
 
-  return content.data as any;
+  const resultData = content.data as any;
+  if (resultData.meta && content.copyright) {
+    resultData.meta.copyright = content.copyright;
+  }
+
+  return resultData;
 }

@@ -3,12 +3,12 @@
 import { motion } from "framer-motion";
 
 interface FooterProps {
-  content: {
-    text: string;
-  };
+  copyright?: string;
 }
 
-export default function Footer({ content }: FooterProps) {
+export default function Footer({ copyright }: FooterProps) {
+  const defaultCopyright = `© ${new Date().getFullYear()} Business Name. All rights reserved.`;
+
   return (
     <footer className="py-12 bg-primary text-white/60 border-t border-white/5">
       <motion.div
@@ -18,7 +18,7 @@ export default function Footer({ content }: FooterProps) {
         className="container-custom flex flex-col md:flex-row items-center justify-between gap-8"
       >
         <div className="text-sm tracking-widest uppercase">
-          {content.text}
+          {copyright || defaultCopyright}
         </div>
 
         <div className="flex gap-8 text-[10px] uppercase tracking-[0.2em]">

@@ -35,7 +35,7 @@ export default function MetaEditor({ initialData }: MetaEditorProps) {
   return (
     <section id="meta" className="p-8 bg-neutral-900 rounded-2xl border border-neutral-800 space-y-6">
       <h2 className="text-2xl font-bold">General Settings (Meta)</h2>
-      
+
       <div className="grid gap-4">
         <div>
           <label className="block text-sm font-medium text-neutral-400 mb-2">Site Name</label>
@@ -46,7 +46,7 @@ export default function MetaEditor({ initialData }: MetaEditorProps) {
             onChange={(e) => setData({ ...data, siteName: e.target.value })}
           />
         </div>
-        
+
         <div>
           <label className="block text-sm font-medium text-neutral-400 mb-2">Site Description</label>
           <textarea
@@ -62,6 +62,17 @@ export default function MetaEditor({ initialData }: MetaEditorProps) {
             value={data.favicon}
             onChange={(url) => setData({ ...data, favicon: url })}
             onRemove={() => setData({ ...data, favicon: '' })}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-neutral-400 mb-2">Copyright Text</label>
+          <input
+            type="text"
+            className="w-full px-4 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary"
+            value={data.copyright || ''}
+            onChange={(e) => setData({ ...data, copyright: e.target.value })}
+            placeholder="© 2025 Business Name. All rights reserved."
           />
         </div>
       </div>
