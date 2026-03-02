@@ -27,6 +27,7 @@ export async function fetchLicenseValidation(): Promise<{
   valid: boolean;
   token?: string;
   grace?: boolean;
+  product?: string;
 }> {
   // No key configured = license required
   if (!LICENSE_KEY || !LICENSE_SERVER_URL) {
@@ -37,14 +38,20 @@ export async function fetchLicenseValidation(): Promise<{
     const response = await fetch(`${LICENSE_SERVER_URL}/api/validate`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
+      body: JSON.stringify({
         key: LICENSE_KEY,
-        product: LICENSE_PRODUCT 
+        product: LICENSE_PRODUCT
       }),
       signal: AbortSignal.timeout(10000),
     });
 
     const data = await response.json();
+
+    // Verify returned product matches what this project expects
+    if (data.valid && data.product && data.product !== LICENSE_PRODUCT) {
+      return { valid: false };
+    }
+
     return data;
   } catch {
     // Server unreachable — grant grace period
