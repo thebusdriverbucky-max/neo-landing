@@ -33,7 +33,7 @@ export default function HeroEditor({ initialData }: HeroEditorProps) {
   };
 
   return (
-    <section id="hero" className="p-8 bg-neutral-900 rounded-2xl border border-neutral-800 space-y-6">
+    <section id="hero" className="p-4 md:p-8 bg-neutral-900 rounded-2xl border border-neutral-800 space-y-6">
       <h2 className="text-2xl font-bold">Hero Section</h2>
 
       <div className="grid gap-4">

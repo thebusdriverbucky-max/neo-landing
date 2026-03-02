@@ -32,7 +32,7 @@ export default function ContactEditor({ initialData }: ContactEditorProps) {
   };
 
   return (
-    <section id="contact" className="p-8 bg-neutral-900 rounded-2xl border border-neutral-800 space-y-6">
+    <section id="contact" className="p-4 md:p-8 bg-neutral-900 rounded-2xl border border-neutral-800 space-y-6">
       <h2 className="text-2xl font-bold">Contact Section</h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

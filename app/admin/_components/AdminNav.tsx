@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { LogOut, LayoutDashboard, Settings, Image as ImageIcon, Briefcase, Info, Mail, Calendar, MessageSquare } from 'lucide-react';
+import { LogOut, LayoutDashboard, Settings, Image as ImageIcon, Briefcase, Info, Mail, Calendar, MessageSquare, Menu, X } from 'lucide-react';
 
 const navItems = [
   { name: 'General', href: '#meta', icon: Settings },
@@ -19,6 +19,7 @@ const navItems = [
 export default function AdminNav() {
   const router = useRouter();
   const [bookingCount, setBookingCount] = useState<number>(0);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -70,17 +71,14 @@ export default function AdminNav() {
     router.refresh();
   };
 
-  return (
-    <nav className="fixed left-0 top-0 h-full w-64 bg-neutral-900 border-r border-neutral-800 p-6 flex flex-col">
-      <div className="mb-10">
-        <h1 className="text-xl font-bold text-white tracking-tighter">ADMIN PANEL</h1>
-      </div>
-
+  const NavLinks = ({ onClick }: { onClick?: () => void }) => (
+    <>
       <div className="flex-1 space-y-2">
         {navItems.map((item) => (
           <a
             key={item.name}
             href={item.href}
+            onClick={onClick}
             className="flex items-center justify-between px-4 py-3 text-neutral-400 hover:text-white hover:bg-neutral-800 rounded-xl transition-all group"
           >
             <div className="flex items-center gap-3">
@@ -97,12 +95,64 @@ export default function AdminNav() {
       </div>
 
       <button
-        onClick={handleLogout}
+        onClick={() => {
+          handleLogout();
+          onClick?.();
+        }}
         className="mt-auto flex items-center gap-3 px-4 py-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-all"
       >
         <LogOut className="w-5 h-5" />
         <span className="font-medium">Logout</span>
       </button>
-    </nav>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile Header */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 h-16 bg-neutral-900 border-b border-neutral-800 px-4 flex items-center justify-between z-50 w-full">
+        <h1 className="text-lg font-bold text-white tracking-tighter">ADMIN PANEL</h1>
+        <button
+          onClick={() => setIsOpen(!isOpen)}
+          className="p-2 text-neutral-400 hover:text-white transition-colors"
+          aria-label="Toggle menu"
+        >
+          {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+        </button>
+      </div>
+
+      {/* Mobile Menu Overlay */}
+      {isOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+          onClick={() => setIsOpen(false)}
+        />
+      )}
+
+      {/* Mobile Sidebar */}
+      <div className={`
+        lg:hidden fixed top-0 left-0 bottom-0 w-72 bg-neutral-900 border-r border-neutral-800 p-6 flex flex-col z-50 transition-transform duration-300 ease-in-out
+        ${isOpen ? 'translate-x-0' : '-translate-x-full'}
+      `}>
+        <div className="mb-10 flex items-center justify-between">
+          <h1 className="text-xl font-bold text-white tracking-tighter">ADMIN PANEL</h1>
+          <button
+            onClick={() => setIsOpen(false)}
+            className="p-2 text-neutral-400 hover:text-white transition-colors"
+          >
+            <X className="w-6 h-6" />
+          </button>
+        </div>
+        <NavLinks onClick={() => setIsOpen(false)} />
+      </div>
+
+      {/* Desktop Sidebar */}
+      <nav className="hidden lg:flex fixed left-0 top-0 h-full w-64 bg-neutral-900 border-r border-neutral-800 p-6 flex flex-col">
+        <div className="mb-10">
+          <h1 className="text-xl font-bold text-white tracking-tighter">ADMIN PANEL</h1>
+        </div>
+        <NavLinks />
+      </nav>
+    </>
   );
 }

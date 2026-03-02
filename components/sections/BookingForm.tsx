@@ -19,7 +19,7 @@ export default function BookingForm({ content }: BookingFormProps) {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setStatus("loading");
-    
+
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
 
@@ -29,7 +29,7 @@ export default function BookingForm({ content }: BookingFormProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
-      
+
       if (res.ok) setStatus("success");
       else setStatus("error");
     } catch (error) {
@@ -64,8 +64,8 @@ export default function BookingForm({ content }: BookingFormProps) {
               <div className="text-5xl mb-6">✨</div>
               <h3 className="text-2xl font-serif text-primary mb-2">Thank You!</h3>
               <p className="text-foreground/60">We will contact you shortly.</p>
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="mt-8"
                 onClick={() => setStatus("idle")}
               >
@@ -81,6 +81,7 @@ export default function BookingForm({ content }: BookingFormProps) {
                     required
                     name="name"
                     type="text"
+                    maxLength={20}
                     className="w-full px-6 py-4 rounded-xl border border-gray-200 focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all"
                     placeholder="John Doe"
                   />
@@ -91,6 +92,7 @@ export default function BookingForm({ content }: BookingFormProps) {
                     required
                     name="email"
                     type="email"
+                    maxLength={100}
                     className="w-full px-6 py-4 rounded-xl border border-gray-200 focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all"
                     placeholder="john@example.com"
                   />
@@ -104,6 +106,7 @@ export default function BookingForm({ content }: BookingFormProps) {
                     required
                     name="phone"
                     type="tel"
+                    maxLength={20}
                     className="w-full px-6 py-4 rounded-xl border border-gray-200 focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all"
                     placeholder="+1 234 567 890"
                   />
@@ -126,6 +129,7 @@ export default function BookingForm({ content }: BookingFormProps) {
                 <textarea
                   name="message"
                   rows={4}
+                  maxLength={500}
                   className="w-full px-6 py-4 rounded-xl border border-gray-200 focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all resize-none"
                   placeholder="Tell us more about your request..."
                 />

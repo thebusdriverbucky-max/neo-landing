@@ -11,6 +11,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Name and phone are required' }, { status: 400 });
     }
 
+    // Server-side validation for character limits
+    if (name.length > 20) {
+      return NextResponse.json({ error: 'Name is too long (max 20 characters)' }, { status: 400 });
+    }
+    if (phone.length > 20) {
+      return NextResponse.json({ error: 'Phone is too long (max 20 characters)' }, { status: 400 });
+    }
+    if (email && email.length > 100) {
+      return NextResponse.json({ error: 'Email is too long (max 100 characters)' }, { status: 400 });
+    }
+    if (message && message.length > 500) {
+      return NextResponse.json({ error: 'Message is too long (max 500 characters)' }, { status: 400 });
+    }
+
     // Rate limiting: check for existing bookings from same email or phone in last 10 minutes
     const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
     const existingBooking = await prisma.booking.findFirst({

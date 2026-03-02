@@ -52,7 +52,7 @@ export default function ServicesEditor({ initialData }: ServicesEditorProps) {
   };
 
   return (
-    <section id="services" className="p-8 bg-neutral-900 rounded-2xl border border-neutral-800 space-y-6">
+    <section id="services" className="p-4 md:p-8 bg-neutral-900 rounded-2xl border border-neutral-800 space-y-6">
       <h2 className="text-2xl font-bold">Services Section</h2>
 
       <div className="grid gap-4">
@@ -79,13 +79,13 @@ export default function ServicesEditor({ initialData }: ServicesEditorProps) {
 
           <div className="grid gap-4">
             {data.items.map((item: any, index: number) => (
-              <div key={index} className="flex gap-4 items-start bg-neutral-800 p-4 rounded-xl border border-neutral-700">
-                <div className="flex-1 grid gap-2">
+              <div key={index} className="flex flex-col sm:flex-row gap-4 items-start bg-neutral-800 p-4 rounded-xl border border-neutral-700">
+                <div className="flex-1 grid gap-2 w-full">
                   <div className="flex gap-2">
                     <input
                       type="text"
-                      placeholder="Icon (emoji)"
-                      className="w-20 px-3 py-1.5 bg-neutral-700 border border-neutral-600 rounded-lg text-white text-sm"
+                      placeholder="Icon"
+                      className="w-16 sm:w-20 px-3 py-1.5 bg-neutral-700 border border-neutral-600 rounded-lg text-white text-sm"
                       value={item.icon}
                       onChange={(e) => updateItem(index, 'icon', e.target.value)}
                     />
@@ -106,7 +106,7 @@ export default function ServicesEditor({ initialData }: ServicesEditorProps) {
                 </div>
                 <button
                   onClick={() => removeItem(index)}
-                  className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition"
+                  className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition self-end sm:self-start"
                 >
                   <Trash2 className="w-5 h-5" />
                 </button>

@@ -53,7 +53,7 @@ export default function AboutEditor({ initialData }: AboutEditorProps) {
   };
 
   return (
-    <section id="about" className="p-8 bg-neutral-900 rounded-2xl border border-neutral-800 space-y-6">
+    <section id="about" className="p-4 md:p-8 bg-neutral-900 rounded-2xl border border-neutral-800 space-y-6">
       <h2 className="text-2xl font-bold">About Us Section</h2>
 
       <div className="grid gap-4">
@@ -98,8 +98,8 @@ export default function AboutEditor({ initialData }: AboutEditorProps) {
 
           <div className="grid gap-4">
             {data.stats.map((stat: any, index: number) => (
-              <div key={index} className="flex gap-4 items-start bg-neutral-800 p-4 rounded-xl border border-neutral-700">
-                <div className="flex-1 grid gap-2">
+              <div key={index} className="flex flex-col sm:flex-row gap-4 items-start bg-neutral-800 p-4 rounded-xl border border-neutral-700">
+                <div className="flex-1 grid gap-2 w-full">
                   <input
                     type="text"
                     placeholder="Value (e.g. 10+)"
@@ -117,7 +117,7 @@ export default function AboutEditor({ initialData }: AboutEditorProps) {
                 </div>
                 <button
                   onClick={() => removeStat(index)}
-                  className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition"
+                  className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg transition self-end sm:self-start"
                 >
                   <Trash2 className="w-5 h-5" />
                 </button>
