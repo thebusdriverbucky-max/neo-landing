@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSiteContent, updateSiteContent } from '@/lib/content';
 import { jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
+import { revalidatePath } from 'next/cache';
 
 async function isAdmin() {
   const cookieStore = await cookies();
@@ -27,7 +28,7 @@ export async function GET() {
   }
 }
 
-export async function POST(request: Request) {
+export async function PATCH(request: Request) {
   if (!(await isAdmin())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
@@ -39,6 +40,7 @@ export async function POST(request: Request) {
     }
 
     const updatedContent = await updateSiteContent(section, data);
+    revalidatePath('/');
     return NextResponse.json(updatedContent);
   } catch (error) {
     return NextResponse.json({ error: 'Failed to update content' }, { status: 500 });

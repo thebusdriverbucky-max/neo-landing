@@ -15,12 +15,16 @@ export default function ServicesEditor({ initialData }: ServicesEditorProps) {
   const handleSave = async () => {
     setLoading(true);
     try {
-      await fetch('/api/admin/content', {
+      const res = await fetch('/api/admin/content', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ section: 'services', data }),
       });
-      alert('Saved!');
+      if (res.ok) {
+        alert('Saved!');
+      } else {
+        alert('Error saving');
+      }
     } catch (error) {
       alert('Error saving');
     } finally {
@@ -50,7 +54,7 @@ export default function ServicesEditor({ initialData }: ServicesEditorProps) {
   return (
     <section id="services" className="p-8 bg-neutral-900 rounded-2xl border border-neutral-800 space-y-6">
       <h2 className="text-2xl font-bold">Services Section</h2>
-      
+
       <div className="grid gap-4">
         <div>
           <label className="block text-sm font-medium text-neutral-400 mb-2">Title</label>
@@ -72,7 +76,7 @@ export default function ServicesEditor({ initialData }: ServicesEditorProps) {
               <Plus className="w-4 h-4" /> Add
             </button>
           </div>
-          
+
           <div className="grid gap-4">
             {data.items.map((item: any, index: number) => (
               <div key={index} className="flex gap-4 items-start bg-neutral-800 p-4 rounded-xl border border-neutral-700">

@@ -14,12 +14,16 @@ export default function ContactEditor({ initialData }: ContactEditorProps) {
   const handleSave = async () => {
     setLoading(true);
     try {
-      await fetch('/api/admin/content', {
+      const res = await fetch('/api/admin/content', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ section: 'contact', data }),
       });
-      alert('Saved!');
+      if (res.ok) {
+        alert('Saved!');
+      } else {
+        alert('Error saving');
+      }
     } catch (error) {
       alert('Error saving');
     } finally {
