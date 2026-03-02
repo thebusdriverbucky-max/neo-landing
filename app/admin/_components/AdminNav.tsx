@@ -21,9 +21,13 @@ export default function AdminNav() {
   const [bookingCount, setBookingCount] = useState<number>(0);
 
   useEffect(() => {
+    const controller = new AbortController();
+
     const fetchBookingCount = async () => {
       try {
-        const response = await fetch('/api/admin/bookings?limit=1');
+        const response = await fetch('/api/admin/bookings?limit=1', {
+          signal: controller.signal
+        });
 
         if (!response.ok) {
           if (response.status === 401) {
@@ -42,7 +46,10 @@ export default function AdminNav() {
         if (data.pagination) {
           setBookingCount(data.pagination.total);
         }
-      } catch (error) {
+      } catch (error: any) {
+        if (error.name === 'AbortError' || error.message === 'Failed to fetch') {
+          return;
+        }
         console.error('Failed to fetch booking count:', error);
       }
     };
@@ -51,7 +58,10 @@ export default function AdminNav() {
 
     // Refresh count every 30 seconds
     const interval = setInterval(fetchBookingCount, 30000);
-    return () => clearInterval(interval);
+    return () => {
+      controller.abort();
+      clearInterval(interval);
+    };
   }, []);
 
   const handleLogout = async () => {
