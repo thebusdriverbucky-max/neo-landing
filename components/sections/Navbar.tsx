@@ -28,10 +28,12 @@ export default function Navbar({ content }: NavbarProps) {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "bg-white/90 backdrop-blur-md py-4 shadow-sm" : "bg-transparent py-6"
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled || isMobileMenuOpen
+          ? "bg-white/90 backdrop-blur-md py-4 shadow-sm"
+          : "bg-white/90 backdrop-blur-md py-4 shadow-sm md:bg-transparent md:py-6 md:shadow-none"
         }`}
     >
-      <div className="container-custom flex items-center justify-between px-4 md:px-6">
+      <div className="w-full max-w-7xl mx-auto flex items-center justify-between px-4 md:px-6">
         <Link href="/" className="text-2xl font-serif font-bold tracking-tighter text-primary flex items-center">
           {content.logoImageUrl ? (
             <div className="relative h-8 md:h-10 w-auto aspect-[3/1]">
@@ -63,7 +65,7 @@ export default function Navbar({ content }: NavbarProps) {
 
         {/* Mobile Menu Button */}
         <button
-          className="md:hidden text-primary p-2 -mr-2"
+          className="md:hidden text-primary p-2"
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         >
           {isMobileMenuOpen ? <X /> : <Menu />}
@@ -77,8 +79,7 @@ export default function Navbar({ content }: NavbarProps) {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className={`absolute top-full left-0 right-0 shadow-xl p-6 md:hidden border-t border-black/5 ${isScrolled ? "bg-white" : "bg-white/80 backdrop-blur-lg"
-              }`}
+            className="absolute top-full left-0 w-full shadow-xl p-6 md:hidden border-t border-black/5 bg-white/95 backdrop-blur-md"
           >
             <div className="flex flex-col gap-4">
               {content.links.map((link) => (
