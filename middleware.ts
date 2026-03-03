@@ -65,42 +65,54 @@ async function licenseMiddleware(request: NextRequest): Promise<NextResponse | n
     return NextResponse.redirect(url);
   }
 
-  // Valid — set/refresh cookie and continue
-  const response = NextResponse.next();
+  // Valid — we need to set/refresh cookie, but we also need to allow other middlewares to run
+  // So we'll return a response only if we actually need to set a cookie.
+  // If we just want to continue, we return null.
 
-  if (token) {
-    // Full JWT from server — valid 24h
-    response.cookies.set(LICENSE_COOKIE_NAME, token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 48, // 48h (grace period if server goes down)
-      path: '/',
-    });
-  } else if (grace) {
-    // Server unreachable — short grace cookie
-    response.cookies.set(LICENSE_COOKIE_NAME, 'grace', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 60 * 60 * 6, // 6h grace
-      path: '/',
-    });
+  if (token || grace) {
+    const response = NextResponse.next();
+    if (token) {
+      response.cookies.set(LICENSE_COOKIE_NAME, token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 60 * 60 * 48,
+        path: '/',
+      });
+    } else if (grace) {
+      response.cookies.set(LICENSE_COOKIE_NAME, 'grace', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 60 * 60 * 6,
+        path: '/',
+      });
+    }
+    return response;
   }
 
-  return response;
+  return null;
 }
 
 export default async function middleware(request: NextRequest) {
   // 1. License check first
   const licenseResponse = await licenseMiddleware(request);
-  if (licenseResponse) return licenseResponse;
+  // If licenseMiddleware returns a redirect, return it immediately
+  if (licenseResponse && licenseResponse.status >= 300 && licenseResponse.status < 400) {
+    return licenseResponse;
+  }
 
   // 2. Admin auth check
   const adminResponse = await adminAuthMiddleware(request);
   if (adminResponse) return adminResponse;
 
-  // 3. Continue to the requested page
+  // 3. If licenseMiddleware returned a response (to set cookies), but not a redirect,
+  // we should ideally merge it with the next response. 
+  // But for simplicity, if licenseMiddleware wanted to set cookies, we return its response.
+  // However, we must ensure adminAuthMiddleware didn't want to redirect.
+  if (licenseResponse) return licenseResponse;
+
+  // 4. Continue to the requested page
   return NextResponse.next();
 }
 

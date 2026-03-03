@@ -20,10 +20,15 @@ async function isAdmin() {
 }
 
 export async function GET() {
+  if (!(await isAdmin())) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
     const content = await getSiteContent();
     return NextResponse.json(content);
   } catch (error) {
+    console.error('Failed to fetch content:', error);
     return NextResponse.json({ error: 'Failed to fetch content' }, { status: 500 });
   }
 }

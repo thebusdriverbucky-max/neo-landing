@@ -4,8 +4,13 @@ const defaultContent = {
   "meta": {
     "siteName": "Business Name",
     "siteDescription": "Your business description",
-    "favicon": "",
-    "copyright": "© 2025 Business Name. All rights reserved."
+    "siteUrl": "https://example.com",
+    "siteLang": "en",
+    "faviconUrl": "https://i.imgur.com/udCYp7c.png",
+    "ogImageUrl": "",
+    "logoText": "LOGO",
+    "logoImageUrl": "",
+    "copyright": "© 2025 Business Name. All rights reserved.",
   },
   "navbar": {
     "logo": "LOGO",
@@ -61,27 +66,58 @@ const defaultContent = {
   }
 };
 
+function deepMerge(target: any, source: any) {
+  const output = { ...target };
+  if (isObject(target) && isObject(source)) {
+    Object.keys(source).forEach(key => {
+      if (isObject(source[key])) {
+        if (!(key in target))
+          Object.assign(output, { [key]: source[key] });
+        else
+          output[key] = deepMerge(target[key], source[key]);
+      } else {
+        if (source[key] !== undefined && source[key] !== null && source[key] !== '') {
+          Object.assign(output, { [key]: source[key] });
+        }
+      }
+    });
+  }
+  return output;
+}
+
+function isObject(item: any) {
+  return (item && typeof item === 'object' && !Array.isArray(item));
+}
+
 export async function getSiteContent() {
-  let content = await prisma.siteContent.findUnique({
+  const content = await prisma.siteContent.findUnique({
     where: { id: 1 },
-  });
+  }) as any;
 
   if (!content) {
-    content = await prisma.siteContent.create({
+    const newContent = await prisma.siteContent.create({
       data: {
         id: 1,
         data: defaultContent,
       },
-    });
+    }) as any;
+    return newContent.data;
   }
 
-  const data = content.data as any;
+  let data = content.data as any;
 
-  // Ensure meta exists and merge copyright from column if available
-  if (data.meta && content.copyright) {
-    data.meta.copyright = content.copyright;
-  } else if (data.meta && !data.meta.copyright) {
-    data.meta.copyright = defaultContent.meta.copyright;
+  // Merge with default content to ensure all fields exist
+  data = deepMerge(defaultContent, data);
+
+  // Ensure meta exists and merge fields from columns if available
+  if (data.meta) {
+    if (content.copyright) data.meta.copyright = content.copyright;
+    if (content.siteName) data.meta.siteName = content.siteName;
+    if (content.siteDescription) data.meta.siteDescription = content.siteDescription;
+    if (content.siteUrl) data.meta.siteUrl = content.siteUrl;
+    if (content.siteLang) data.meta.siteLang = content.siteLang;
+    if (content.faviconUrl) data.meta.faviconUrl = content.faviconUrl;
+    if (content.ogImageUrl) data.meta.ogImageUrl = content.ogImageUrl;
   }
 
   return data;
@@ -99,13 +135,27 @@ export async function updateSiteContent(section: string, data: any) {
     where: { id: 1 },
     data: {
       data: updatedData,
-      ...(section === 'meta' ? { copyright: data.copyright || '' } : {}),
+      ...(section === 'meta' ? {
+        copyright: data.copyright || '',
+        siteName: data.siteName || '',
+        siteDescription: data.siteDescription || '',
+        siteUrl: data.siteUrl || '',
+        siteLang: data.siteLang || '',
+        faviconUrl: data.faviconUrl || '',
+        ogImageUrl: data.ogImageUrl || ''
+      } : {}),
     },
-  });
+  }) as any;
 
   const resultData = content.data as any;
-  if (resultData.meta && content.copyright) {
-    resultData.meta.copyright = content.copyright;
+  if (resultData.meta) {
+    if (content.copyright) resultData.meta.copyright = content.copyright;
+    if (content.siteName) resultData.meta.siteName = content.siteName;
+    if (content.siteDescription) resultData.meta.siteDescription = content.siteDescription;
+    if (content.siteUrl) resultData.meta.siteUrl = content.siteUrl;
+    if (content.siteLang) resultData.meta.siteLang = content.siteLang;
+    if (content.faviconUrl) resultData.meta.faviconUrl = content.faviconUrl;
+    if (content.ogImageUrl) resultData.meta.ogImageUrl = content.ogImageUrl;
   }
 
   return resultData;

@@ -31,7 +31,9 @@ export default function ImageUpload({
         body: formData,
       });
       const data = await res.json();
-      if (data.url) {
+      if (data.secure_url) {
+        onChange(data.secure_url);
+      } else if (data.url) {
         onChange(data.url);
       }
     } catch (error) {

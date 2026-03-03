@@ -82,7 +82,7 @@ export default function BookingForm({ content }: BookingFormProps) {
                     name="name"
                     type="text"
                     maxLength={20}
-                    className="w-full px-6 py-4 rounded-xl border border-gray-200 focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all"
+                    className="w-full px-6 py-4 rounded-xl border border-gray-200 focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all text-neutral-900"
                     placeholder="John Doe"
                   />
                 </div>
@@ -93,7 +93,7 @@ export default function BookingForm({ content }: BookingFormProps) {
                     name="email"
                     type="email"
                     maxLength={100}
-                    className="w-full px-6 py-4 rounded-xl border border-gray-200 focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all"
+                    className="w-full px-6 py-4 rounded-xl border border-gray-200 focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all text-neutral-900"
                     placeholder="john@example.com"
                   />
                 </div>
@@ -107,7 +107,7 @@ export default function BookingForm({ content }: BookingFormProps) {
                     name="phone"
                     type="tel"
                     maxLength={20}
-                    className="w-full px-6 py-4 rounded-xl border border-gray-200 focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all"
+                    className="w-full px-6 py-4 rounded-xl border border-gray-200 focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all text-neutral-900"
                     placeholder="+1 234 567 890"
                   />
                 </div>
@@ -118,7 +118,7 @@ export default function BookingForm({ content }: BookingFormProps) {
                       required
                       name="date"
                       type="date"
-                      className="w-full px-6 py-4 rounded-xl border border-gray-200 focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all"
+                      className="w-full px-6 py-4 rounded-xl border border-gray-200 focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all text-neutral-900"
                     />
                   </div>
                 )}
@@ -130,7 +130,7 @@ export default function BookingForm({ content }: BookingFormProps) {
                   name="message"
                   rows={4}
                   maxLength={500}
-                  className="w-full px-6 py-4 rounded-xl border border-gray-200 focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all resize-none"
+                  className="w-full px-6 py-4 rounded-xl border border-gray-200 focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all resize-none text-neutral-900"
                   placeholder="Tell us more about your request..."
                 />
               </div>

@@ -8,8 +8,28 @@ import GalleryEditor from './_components/GalleryEditor';
 import BookingEditor from './_components/BookingEditor';
 import ContactEditor from './_components/ContactEditor';
 import MessagesManager from './_components/MessagesManager';
+import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
+import { jwtVerify } from 'jose';
+
+async function checkAuth() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get('admin_token')?.value;
+
+  if (!token) {
+    redirect('/admin/login');
+  }
+
+  try {
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'default-secret');
+    await jwtVerify(token, secret);
+  } catch (error) {
+    redirect('/admin/login');
+  }
+}
 
 export default async function AdminPage() {
+  await checkAuth();
   const content = await getSiteContent();
 
   return (

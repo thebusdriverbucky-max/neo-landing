@@ -17,6 +17,12 @@ model SiteContent {
   id        Int      @id @default(1)
   data      Json
   copyright String?
+  siteName        String?
+  siteDescription String?
+  siteUrl         String?
+  siteLang        String?
+  faviconUrl      String?
+  ogImageUrl      String?
   updatedAt DateTime @updatedAt
 }
 

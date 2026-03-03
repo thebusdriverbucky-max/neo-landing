@@ -48,6 +48,13 @@ export default function MessagesManager() {
         const data = await res.json();
         setBookings(data.bookings);
         setPagination(data.pagination);
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        console.error(`Failed to fetch bookings: ${res.status} ${res.statusText}`, errorData);
+        if (res.status === 401) {
+          // Redirect to login if unauthorized
+          window.location.href = '/admin/login';
+        }
       }
     } catch (error) {
       console.error('Failed to fetch bookings:', error);

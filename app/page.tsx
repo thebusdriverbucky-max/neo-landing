@@ -15,14 +15,18 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen">
-      <Navbar content={content.navbar} />
-      <Hero content={content.hero} />
-      <About content={content.about} />
-      <Services content={content.services} />
-      <Gallery content={content.gallery} />
-      <BookingForm content={content.booking} />
-      <Contact content={content.contact} />
-      <Footer copyright={content.meta.copyright} />
+      <Navbar content={{
+        ...(content?.navbar || {}),
+        logoText: content?.meta?.logoText,
+        logoImageUrl: content?.meta?.logoImageUrl
+      }} />
+      <Hero content={content?.hero} />
+      <About content={content?.about} />
+      <Services content={content?.services} />
+      <Gallery content={content?.gallery} />
+      <BookingForm content={content?.booking} />
+      <Contact content={content?.contact} />
+      <Footer copyright={content?.meta?.copyright} />
     </main>
   );
 }
