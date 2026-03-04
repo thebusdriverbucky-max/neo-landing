@@ -22,18 +22,19 @@ export default function Navbar({ content }: NavbarProps) {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <nav
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-300 ${isScrolled || isMobileMenuOpen
-          ? "bg-white/90 backdrop-blur-md py-4 shadow-sm"
-          : "bg-white/90 backdrop-blur-md py-4 shadow-sm md:bg-transparent md:py-6 md:shadow-none"
+      className={`fixed top-0 left-0 w-full max-w-[100vw] overflow-x-clip z-50 transition-all duration-300 ${isScrolled || isMobileMenuOpen
+        ? "bg-white/90 backdrop-blur-md py-4 shadow-sm"
+        : "bg-white/90 backdrop-blur-md py-4 shadow-sm md:bg-transparent md:py-6 md:shadow-none"
         }`}
     >
-      <div className="w-full max-w-7xl mx-auto flex items-center justify-between px-4 md:px-6">
+      <div className="w-full max-w-7xl mx-auto flex items-center justify-between px-8 md:px-12">
         <Link href="/" className="text-2xl font-serif font-bold tracking-tighter text-primary flex items-center">
           {content.logoImageUrl ? (
             <div className="relative h-8 md:h-10 w-auto aspect-[3/1]">
