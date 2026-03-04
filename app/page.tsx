@@ -14,7 +14,7 @@ export default async function Home() {
   const content = await getSiteContent();
 
   return (
-    <main className="min-h-screen">
+    <main className="min-h-screen overflow-x-hidden">
       <Navbar content={{
         ...(content?.navbar || {}),
         logoText: content?.meta?.logoText,
