@@ -7,6 +7,7 @@ import ServicesEditor from './_components/ServicesEditor';
 import GalleryEditor from './_components/GalleryEditor';
 import BookingEditor from './_components/BookingEditor';
 import ContactEditor from './_components/ContactEditor';
+import LegalEditor from './_components/LegalEditor';
 import MessagesManager from './_components/MessagesManager';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -50,6 +51,7 @@ export default async function AdminPage() {
           <GalleryEditor initialData={content.gallery} />
           <BookingEditor initialData={content.booking} />
           <ContactEditor initialData={content.contact} />
+          <LegalEditor initialData={content.legal} />
           <MessagesManager />
         </div>
       </main>

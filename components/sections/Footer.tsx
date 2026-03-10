@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Link from "next/link";
 
 interface FooterProps {
   copyright?: string;
@@ -22,9 +23,9 @@ export default function Footer({ copyright }: FooterProps) {
         </div>
 
         <div className="flex gap-8 text-[10px] uppercase tracking-[0.2em]">
-          <a href="#" className="hover:text-secondary transition-colors">Privacy Policy</a>
-          <a href="#" className="hover:text-secondary transition-colors">Terms of Service</a>
-          <a href="#" className="hover:text-secondary transition-colors">Cookies</a>
+          <Link href="/privacy-policy" className="hover:text-secondary transition-colors">Privacy Policy</Link>
+          <Link href="/terms-of-service" className="hover:text-secondary transition-colors">Terms of Service</Link>
+          <Link href="/cookies" className="hover:text-secondary transition-colors">Cookies</Link>
         </div>
       </motion.div>
     </footer>

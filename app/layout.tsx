@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { getSiteContent } from "@/lib/content";
+import CookieBanner from "@/components/ui/CookieBanner";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -59,6 +60,7 @@ export default async function RootLayout({
         className={`${inter.variable} ${playfair.variable} antialiased font-sans`}
       >
         {children}
+        <CookieBanner />
       </body>
     </html>
   );

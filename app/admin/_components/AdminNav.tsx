@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { LogOut, LayoutDashboard, Settings, Image as ImageIcon, Briefcase, Info, Mail, Calendar, MessageSquare, Menu, X } from 'lucide-react';
+import { LogOut, LayoutDashboard, Settings, Image as ImageIcon, Briefcase, Info, Mail, Calendar, MessageSquare, Menu, X, FileText } from 'lucide-react';
 
 const navItems = [
   { name: 'General', href: '#meta', icon: Settings },
@@ -13,6 +13,7 @@ const navItems = [
   { name: 'Gallery', href: '#gallery', icon: ImageIcon },
   { name: 'Booking', href: '#booking', icon: Calendar },
   { name: 'Contact', href: '#contact', icon: Mail },
+  { name: 'Legal', href: '#legal', icon: FileText },
   { name: 'Messages', href: '#messages', icon: MessageSquare },
 ];
 

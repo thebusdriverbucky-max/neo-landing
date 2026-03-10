@@ -61,6 +61,11 @@ const defaultContent = {
     "instagram": "",
     "facebook": ""
   },
+  "legal": {
+    "privacyPolicy": "Privacy Policy\n\nWe respect your privacy and are committed to protecting your personal data. This privacy policy will inform you as to how we look after your personal data when you visit our website and tell you about your privacy rights and how the law protects you.",
+    "termsOfService": "Terms of Service\n\nThese terms and conditions outline the rules and regulations for the use of our Website. By accessing this website we assume you accept these terms and conditions. Do not continue to use the website if you do not agree to take all of the terms and conditions stated on this page.",
+    "cookiePolicy": "Cookie Policy\n\nWe use cookies to help improve your experience of our website. This cookie policy is part of our privacy policy, and covers the use of cookies between your device and our site. We also provide basic information on third-party services we may use, who may also use cookies as part of their service, though they are not covered by our policy."
+  },
   "footer": {
     "text": "© 2025 Business Name. All rights reserved."
   }
