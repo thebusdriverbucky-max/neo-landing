@@ -12,63 +12,22 @@ A modern, animated landing page template with an integrated CMS for content mana
 - ☁️ **Cloudinary** for image uploads
 - 🔑 **License System** for license verification
 
-## Prerequisites
+## Getting Started
 
-- Node.js 18+
-- PostgreSQL (or any other DB supported by Prisma)
-- Cloudinary account (for image uploads)
+To set up, run, and deploy this project, please refer to our official guides:
 
-## Installation
+1. **First-Step Guide (Start Here):**  
+   [https://www.ownyourwebsite.app/help](https://www.ownyourwebsite.app/help) — Read this first to quickly understand how the template works and get it running.
 
-1. Clone the repository:
-   ```bash
-   git clone <repository-url>
-   cd landing-template/neo-landing
-   ```
+2. **Deployment Guide:**  
+   [https://www.ownyourwebsite.app/docs/deploy](https://www.ownyourwebsite.app/docs/deploy) — Step-by-step instructions on deploying your website to production.
 
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
+3. **Environment Variables Config:**  
+   [https://www.ownyourwebsite.app/docs/env](https://www.ownyourwebsite.app/docs/env) — Information on which environment variables are required and how to obtain them.
 
-3. Configure environment variables:
-   Copy `.env.example` to `.env` and fill in the required fields:
-   ```bash
-   cp .env.example .env
-   ```
+## License Configuration
 
-## Environment Variables (.env)
-
-| Variable | Description |
-|----------|-------------|
-| `DATABASE_URL` | Your PostgreSQL database URL |
-| `ADMIN_PASSWORD` | Password for the admin panel |
-| `JWT_SECRET` | Secret key for admin authorization |
-| `CLOUDINARY_*` | Your Cloudinary account credentials |
-| `LICENSE_KEY` | Your license key |
-| `LICENSE_SERVER_URL` | URL of the license server |
-| `LICENSE_PRODUCT` | Product identifier (default: `neo-landing`) |
-
-## Database Setup and Seeding
-
-1. Apply Prisma migrations:
-   ```bash
-   npx prisma migrate dev --name init
-   ```
-
-2. Run the seed script to create initial content:
-   ```bash
-   npx prisma db seed
-   ```
-
-## Running the Project
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) to view the landing page.
-The admin panel is available at [http://localhost:3000/admin](http://localhost:3000/admin).
+All configuration values (including `LICENSE_KEY`, `LICENSE_PRODUCT`, or any other license-related keys) will be sent directly to your email address immediately after purchase. Simply paste them into your environment variables when configuring the project!
 
 ## Project Structure
 
