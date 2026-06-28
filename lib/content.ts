@@ -1,4 +1,5 @@
 import prisma from './prisma';
+import { SiteContent } from '@prisma/client';
 
 const defaultContent = {
   "meta": {
@@ -71,6 +72,8 @@ const defaultContent = {
   }
 };
 
+export type SiteContentData = typeof defaultContent;
+
 function deepMerge(target: any, source: any) {
   const output = { ...target };
   if (isObject(target) && isObject(source)) {
@@ -97,7 +100,7 @@ function isObject(item: any) {
 export async function getSiteContent() {
   const content = await prisma.siteContent.findUnique({
     where: { id: 1 },
-  }) as any;
+  });
 
   if (!content) {
     const newContent = await prisma.siteContent.create({
@@ -105,11 +108,11 @@ export async function getSiteContent() {
         id: 1,
         data: defaultContent,
       },
-    }) as any;
-    return newContent.data;
+    });
+    return newContent.data as unknown as SiteContentData;
   }
 
-  let data = content.data as any;
+  let data = content.data as unknown as SiteContentData;
 
   // Merge with default content to ensure all fields exist
   data = deepMerge(defaultContent, data);
@@ -150,9 +153,9 @@ export async function updateSiteContent(section: string, data: any) {
         ogImageUrl: data.ogImageUrl || ''
       } : {}),
     },
-  }) as any;
+  });
 
-  const resultData = content.data as any;
+  const resultData = content.data as unknown as SiteContentData;
   if (resultData.meta) {
     if (content.copyright) resultData.meta.copyright = content.copyright;
     if (content.siteName) resultData.meta.siteName = content.siteName;
