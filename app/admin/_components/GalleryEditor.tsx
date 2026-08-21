@@ -3,10 +3,11 @@
 import { useState } from 'react';
 import Button from '@/components/ui/Button';
 import ImageUpload from '@/components/ui/ImageUpload';
-import { Plus, Trash2 } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
+import type { SiteContentData } from '@/lib/content';
 
 interface GalleryEditorProps {
-  initialData: any;
+  initialData: SiteContentData['gallery'];
 }
 
 export default function GalleryEditor({ initialData }: GalleryEditorProps) {
@@ -26,7 +27,7 @@ export default function GalleryEditor({ initialData }: GalleryEditorProps) {
       } else {
         alert('Error saving');
       }
-    } catch (error) {
+    } catch {
       alert('Error saving');
     } finally {
       setLoading(false);
@@ -65,7 +66,7 @@ export default function GalleryEditor({ initialData }: GalleryEditorProps) {
           <label className="block text-sm font-medium text-neutral-400">Images</label>
 
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {data.images.map((url: string, index: number) => (
+            {data.images.map((url, index) => (
               <div key={index} className="relative aspect-square rounded-xl overflow-hidden border border-neutral-700 group">
                 <img src={url} alt="" className="w-full h-full object-cover" />
                 <button

@@ -29,7 +29,7 @@ export default function AdminLoginPage() {
         const data = await res.json();
         setError(data.error || 'Invalid password');
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred during login');
     } finally {
       setLoading(false);

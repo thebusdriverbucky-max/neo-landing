@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import Button from '@/components/ui/Button';
+import type { SiteContentData } from '@/lib/content';
 
 interface LegalEditorProps {
-  initialData: any;
+  initialData: SiteContentData['legal'];
 }
 
 export default function LegalEditor({ initialData }: LegalEditorProps) {
@@ -24,7 +25,7 @@ export default function LegalEditor({ initialData }: LegalEditorProps) {
       } else {
         alert('Error saving');
       }
-    } catch (error) {
+    } catch {
       alert('Error saving');
     } finally {
       setLoading(false);

@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import Button from '@/components/ui/Button';
+import type { SiteContentData } from '@/lib/content';
 
 interface BookingEditorProps {
-  initialData: any;
+  initialData: SiteContentData['booking'];
 }
 
 export default function BookingEditor({ initialData }: BookingEditorProps) {
@@ -24,7 +25,7 @@ export default function BookingEditor({ initialData }: BookingEditorProps) {
       } else {
         alert('Error saving');
       }
-    } catch (error) {
+    } catch {
       alert('Error saving');
     } finally {
       setLoading(false);

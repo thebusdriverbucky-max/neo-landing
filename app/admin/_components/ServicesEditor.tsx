@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import Button from '@/components/ui/Button';
 import { Plus, Trash2 } from 'lucide-react';
+import type { SiteContentData } from '@/lib/content';
 
 interface ServicesEditorProps {
-  initialData: any;
+  initialData: SiteContentData['services'];
 }
 
 export default function ServicesEditor({ initialData }: ServicesEditorProps) {
@@ -25,7 +26,7 @@ export default function ServicesEditor({ initialData }: ServicesEditorProps) {
       } else {
         alert('Error saving');
       }
-    } catch (error) {
+    } catch {
       alert('Error saving');
     } finally {
       setLoading(false);
@@ -78,7 +79,7 @@ export default function ServicesEditor({ initialData }: ServicesEditorProps) {
           </div>
 
           <div className="grid gap-4">
-            {data.items.map((item: any, index: number) => (
+            {data.items.map((item, index) => (
               <div key={index} className="flex flex-col sm:flex-row gap-4 items-start bg-neutral-800 p-4 rounded-xl border border-neutral-700">
                 <div className="flex-1 grid gap-2 w-full">
                   <div className="flex gap-2">

@@ -12,19 +12,19 @@ import MessagesManager from './_components/MessagesManager';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { jwtVerify } from 'jose';
+import { ADMIN_TOKEN_COOKIE, getJwtSecret } from '@/lib/auth';
 
 async function checkAuth() {
   const cookieStore = await cookies();
-  const token = cookieStore.get('admin_token')?.value;
+  const token = cookieStore.get(ADMIN_TOKEN_COOKIE)?.value;
 
   if (!token) {
     redirect('/admin/login');
   }
 
   try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'default-secret');
-    await jwtVerify(token, secret);
-  } catch (error) {
+    await jwtVerify(token, getJwtSecret());
+  } catch {
     redirect('/admin/login');
   }
 }

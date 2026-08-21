@@ -14,7 +14,6 @@ import {
   Loader2,
   AlertCircle
 } from 'lucide-react';
-import Button from '@/components/ui/Button';
 
 interface Booking {
   id: number;
@@ -38,7 +37,7 @@ export default function MessagesManager() {
   const [pagination, setPagination] = useState<Pagination | null>(null);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(5);
+  const limit = 5;
 
   const fetchBookings = useCallback(async () => {
     setLoading(true);

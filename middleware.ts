@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyLicenseToken, fetchLicenseValidation, LICENSE_COOKIE_NAME } from '@/lib/license';
 import { jwtVerify } from 'jose';
+import { verifyLicenseToken, fetchLicenseValidation, LICENSE_COOKIE_NAME } from '@/lib/license';
+import { getJwtSecret } from '@/lib/auth';
 
 // Paths that skip license check entirely
 const LICENSE_SKIP_PATHS = [
@@ -26,10 +27,9 @@ async function adminAuthMiddleware(request: NextRequest): Promise<NextResponse |
     }
 
     try {
-      const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'default-secret');
-      await jwtVerify(token, secret);
+      await jwtVerify(token, getJwtSecret());
       return null;
-    } catch (error) {
+    } catch {
       const url = request.nextUrl.clone();
       url.pathname = '/admin/login';
       return NextResponse.redirect(url);

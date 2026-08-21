@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import Button from '@/components/ui/Button';
 import ImageUpload from '@/components/ui/ImageUpload';
+import type { SiteContentData } from '@/lib/content';
 
 interface HeroEditorProps {
-  initialData: any;
+  initialData: SiteContentData['hero'];
 }
 
 export default function HeroEditor({ initialData }: HeroEditorProps) {
@@ -25,7 +26,7 @@ export default function HeroEditor({ initialData }: HeroEditorProps) {
       } else {
         alert('Error saving');
       }
-    } catch (error) {
+    } catch {
       alert('Error saving');
     } finally {
       setLoading(false);

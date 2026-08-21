@@ -2,9 +2,10 @@
 
 import { useState } from 'react';
 import Button from '@/components/ui/Button';
+import type { SiteContentData } from '@/lib/content';
 
 interface ContactEditorProps {
-  initialData: any;
+  initialData: SiteContentData['contact'];
 }
 
 export default function ContactEditor({ initialData }: ContactEditorProps) {
@@ -24,7 +25,7 @@ export default function ContactEditor({ initialData }: ContactEditorProps) {
       } else {
         alert('Error saving');
       }
-    } catch (error) {
+    } catch {
       alert('Error saving');
     } finally {
       setLoading(false);

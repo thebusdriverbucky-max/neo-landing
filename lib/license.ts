@@ -3,19 +3,21 @@ import { jwtVerify } from 'jose';
 const LICENSE_SERVER_URL = process.env.LICENSE_SERVER_URL || '';
 const LICENSE_KEY = process.env.LICENSE_KEY || '';
 const LICENSE_PRODUCT = process.env.LICENSE_PRODUCT || 'neo-landing';
+const LICENSE_SERVER_SECRET = process.env.LICENSE_SERVER_SECRET || '';
 
 export const LICENSE_COOKIE_NAME = 'neo_license';
 
-export function getLicenseSecret() {
-  return new TextEncoder().encode(
-    process.env.LICENSE_SERVER_SECRET || 'fallback_dev_secret'
-  );
-}
-
-// Verify JWT locally — no network call, works in Edge Runtime
+// Verify JWT locally — no network call, works in Edge Runtime.
+// If LICENSE_SERVER_SECRET is not configured we cannot verify locally,
+// so we return false and the middleware falls back to the license server.
 export async function verifyLicenseToken(token: string): Promise<boolean> {
+  if (!LICENSE_SERVER_SECRET) return false;
+
   try {
-    const { payload } = await jwtVerify(token, getLicenseSecret());
+    const { payload } = await jwtVerify(
+      token,
+      new TextEncoder().encode(LICENSE_SERVER_SECRET)
+    );
     return payload.valid === true;
   } catch {
     return false;

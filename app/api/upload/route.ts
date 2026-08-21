@@ -1,22 +1,6 @@
 import { NextResponse } from 'next/server';
 import cloudinary from '@/lib/cloudinary';
-import { jwtVerify } from 'jose';
-import { cookies } from 'next/headers';
-
-async function isAdmin() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('admin_token')?.value;
-
-  if (!token) return false;
-
-  try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'default-secret');
-    await jwtVerify(token, secret);
-    return true;
-  } catch (error) {
-    return false;
-  }
-}
+import { isAdmin } from '@/lib/auth';
 
 export async function POST(request: Request) {
   if (!(await isAdmin())) {

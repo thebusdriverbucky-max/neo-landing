@@ -1,5 +1,5 @@
 import prisma from './prisma';
-import { SiteContent } from '@prisma/client';
+import { Prisma } from '@prisma/client';
 
 const defaultContent = {
   "meta": {
@@ -43,7 +43,7 @@ const defaultContent = {
   },
   "gallery": {
     "title": "Our Work",
-    "images": []
+    "images": [] as string[]
   },
   "booking": {
     "title": "Book Now",
@@ -74,27 +74,30 @@ const defaultContent = {
 
 export type SiteContentData = typeof defaultContent;
 
-function deepMerge(target: any, source: any) {
-  const output = { ...target };
+type JsonObject = Record<string, unknown>;
+
+function isObject(item: unknown): item is JsonObject {
+  return Boolean(item) && typeof item === 'object' && !Array.isArray(item);
+}
+
+function deepMerge(target: JsonObject, source: JsonObject): JsonObject {
+  const output: JsonObject = { ...target };
   if (isObject(target) && isObject(source)) {
     Object.keys(source).forEach(key => {
-      if (isObject(source[key])) {
+      const sourceValue = source[key];
+      if (isObject(sourceValue)) {
         if (!(key in target))
-          Object.assign(output, { [key]: source[key] });
+          Object.assign(output, { [key]: sourceValue });
         else
-          output[key] = deepMerge(target[key], source[key]);
+          output[key] = deepMerge(target[key] as JsonObject, sourceValue);
       } else {
-        if (source[key] !== undefined && source[key] !== null && source[key] !== '') {
-          Object.assign(output, { [key]: source[key] });
+        if (sourceValue !== undefined && sourceValue !== null && sourceValue !== '') {
+          Object.assign(output, { [key]: sourceValue });
         }
       }
     });
   }
   return output;
-}
-
-function isObject(item: any) {
-  return (item && typeof item === 'object' && !Array.isArray(item));
 }
 
 export async function getSiteContent() {
@@ -115,7 +118,7 @@ export async function getSiteContent() {
   let data = content.data as unknown as SiteContentData;
 
   // Merge with default content to ensure all fields exist
-  data = deepMerge(defaultContent, data);
+  data = deepMerge(defaultContent, data) as unknown as SiteContentData;
 
   // Ensure meta exists and merge fields from columns if available
   if (data.meta) {
@@ -131,7 +134,7 @@ export async function getSiteContent() {
   return data;
 }
 
-export async function updateSiteContent(section: string, data: any) {
+export async function updateSiteContent(section: string, data: JsonObject) {
   const currentContent = await getSiteContent();
 
   const updatedData = {
@@ -142,15 +145,15 @@ export async function updateSiteContent(section: string, data: any) {
   const content = await prisma.siteContent.update({
     where: { id: 1 },
     data: {
-      data: updatedData,
+      data: updatedData as unknown as Prisma.InputJsonValue,
       ...(section === 'meta' ? {
-        copyright: data.copyright || '',
-        siteName: data.siteName || '',
-        siteDescription: data.siteDescription || '',
-        siteUrl: data.siteUrl || '',
-        siteLang: data.siteLang || '',
-        faviconUrl: data.faviconUrl || '',
-        ogImageUrl: data.ogImageUrl || ''
+        copyright: (data.copyright as string) || '',
+        siteName: (data.siteName as string) || '',
+        siteDescription: (data.siteDescription as string) || '',
+        siteUrl: (data.siteUrl as string) || '',
+        siteLang: (data.siteLang as string) || '',
+        faviconUrl: (data.faviconUrl as string) || '',
+        ogImageUrl: (data.ogImageUrl as string) || ''
       } : {}),
     },
   });

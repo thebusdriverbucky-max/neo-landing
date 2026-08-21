@@ -4,9 +4,10 @@ import { useState } from 'react';
 import Button from '@/components/ui/Button';
 import ImageUpload from '@/components/ui/ImageUpload';
 import { Plus, Trash2 } from 'lucide-react';
+import type { SiteContentData } from '@/lib/content';
 
 interface AboutEditorProps {
-  initialData: any;
+  initialData: SiteContentData['about'];
 }
 
 export default function AboutEditor({ initialData }: AboutEditorProps) {
@@ -26,7 +27,7 @@ export default function AboutEditor({ initialData }: AboutEditorProps) {
       } else {
         alert('Error saving');
       }
-    } catch (error) {
+    } catch {
       alert('Error saving');
     } finally {
       setLoading(false);
@@ -97,7 +98,7 @@ export default function AboutEditor({ initialData }: AboutEditorProps) {
           </div>
 
           <div className="grid gap-4">
-            {data.stats.map((stat: any, index: number) => (
+            {data.stats.map((stat, index) => (
               <div key={index} className="flex flex-col sm:flex-row gap-4 items-start bg-neutral-800 p-4 rounded-xl border border-neutral-700">
                 <div className="flex-1 grid gap-2 w-full">
                   <input

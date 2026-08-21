@@ -3,9 +3,10 @@
 import { useState } from 'react';
 import Button from '@/components/ui/Button';
 import ImageUpload from '@/components/ui/ImageUpload';
+import type { SiteContentData } from '@/lib/content';
 
 interface MetaEditorProps {
-  initialData: any;
+  initialData: SiteContentData['meta'];
 }
 
 export default function MetaEditor({ initialData }: MetaEditorProps) {
@@ -25,7 +26,7 @@ export default function MetaEditor({ initialData }: MetaEditorProps) {
       } else {
         alert('Error saving');
       }
-    } catch (error) {
+    } catch {
       alert('Error saving');
     } finally {
       setLoading(false);

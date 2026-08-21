@@ -1,23 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSiteContent, updateSiteContent } from '@/lib/content';
-import { jwtVerify } from 'jose';
-import { cookies } from 'next/headers';
+import { isAdmin } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
-
-async function isAdmin() {
-  const cookieStore = await cookies();
-  const token = cookieStore.get('admin_token')?.value;
-
-  if (!token) return false;
-
-  try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET || 'default-secret');
-    await jwtVerify(token, secret);
-    return true;
-  } catch (error) {
-    return false;
-  }
-}
 
 export async function GET() {
   if (!(await isAdmin())) {
@@ -47,7 +31,7 @@ export async function PATCH(request: Request) {
     const updatedContent = await updateSiteContent(section, data);
     revalidatePath('/');
     return NextResponse.json(updatedContent);
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Failed to update content' }, { status: 500 });
   }
 }

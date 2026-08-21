@@ -32,7 +32,7 @@ export default function BookingForm({ content }: BookingFormProps) {
 
       if (res.ok) setStatus("success");
       else setStatus("error");
-    } catch (error) {
+    } catch {
       setStatus("error");
     }
   };

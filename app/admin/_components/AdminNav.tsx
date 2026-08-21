@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { LogOut, LayoutDashboard, Settings, Image as ImageIcon, Briefcase, Info, Mail, Calendar, MessageSquare, Menu, X, FileText } from 'lucide-react';
 
@@ -48,8 +47,9 @@ export default function AdminNav() {
         if (data.pagination) {
           setBookingCount(data.pagination.total);
         }
-      } catch (error: any) {
-        if (error.name === 'AbortError' || error.message === 'Failed to fetch') {
+      } catch (error) {
+        const err = error as { name?: string; message?: string };
+        if (err.name === 'AbortError' || err.message === 'Failed to fetch') {
           return;
         }
         console.error('Failed to fetch booking count:', error);
