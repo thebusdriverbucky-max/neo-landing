@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
-import { verifyLicenseToken, fetchLicenseValidation, LICENSE_COOKIE_NAME } from '@/lib/license';
+import {
+  createGraceToken,
+  verifyGraceToken,
+  verifyLicenseToken,
+  fetchLicenseValidation,
+  LICENSE_COOKIE_NAME,
+} from '@/lib/license';
 import { getJwtSecret } from '@/lib/auth';
 
 // Paths that skip license check entirely
@@ -50,9 +56,9 @@ async function licenseMiddleware(request: NextRequest): Promise<NextResponse | n
 
   // Check existing JWT cookie
   const cookieToken = request.cookies.get(LICENSE_COOKIE_NAME)?.value;
-  if (cookieToken && cookieToken !== 'grace') {
-    const isValid = await verifyLicenseToken(cookieToken);
-    if (isValid) return null; // Valid JWT — allow through
+  if (cookieToken) {
+    if (await verifyLicenseToken(cookieToken)) return null;
+    if (await verifyGraceToken(cookieToken)) return null;
   }
 
   // Cookie missing or expired — fetch from license server
@@ -80,13 +86,19 @@ async function licenseMiddleware(request: NextRequest): Promise<NextResponse | n
         path: '/',
       });
     } else if (grace) {
-      response.cookies.set(LICENSE_COOKIE_NAME, 'grace', {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict',
-        maxAge: 60 * 60 * 6,
-        path: '/',
-      });
+      try {
+        const graceToken = await createGraceToken(6);
+        response.cookies.set(LICENSE_COOKIE_NAME, graceToken, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+          maxAge: 60 * 60 * 6,
+          path: '/',
+        });
+      } catch {
+        // Without a configured shared secret no unverifiable grace cookie is
+        // persisted; the next request will retry the license server.
+      }
     }
     return response;
   }

@@ -1,4 +1,4 @@
-import { jwtVerify } from 'jose';
+import { SignJWT, jwtVerify } from 'jose';
 
 const LICENSE_SERVER_URL = process.env.LICENSE_SERVER_URL || '';
 const LICENSE_KEY = process.env.LICENSE_KEY || '';
@@ -19,6 +19,30 @@ export async function verifyLicenseToken(token: string): Promise<boolean> {
       new TextEncoder().encode(LICENSE_SERVER_SECRET)
     );
     return payload.valid === true;
+  } catch {
+    return false;
+  }
+}
+
+export async function createGraceToken(hours = 6): Promise<string> {
+  if (!LICENSE_SERVER_SECRET) {
+    throw new Error('LICENSE_SERVER_SECRET is not configured');
+  }
+  return new SignJWT({ grace: true })
+    .setProtectedHeader({ alg: 'HS256' })
+    .setIssuedAt()
+    .setExpirationTime(`${hours}h`)
+    .sign(new TextEncoder().encode(LICENSE_SERVER_SECRET));
+}
+
+export async function verifyGraceToken(token: string): Promise<boolean> {
+  if (!LICENSE_SERVER_SECRET) return false;
+  try {
+    const { payload } = await jwtVerify(
+      token,
+      new TextEncoder().encode(LICENSE_SERVER_SECRET)
+    );
+    return payload.grace === true;
   } catch {
     return false;
   }
@@ -46,6 +70,10 @@ export async function fetchLicenseValidation(): Promise<{
       }),
       signal: AbortSignal.timeout(10000),
     });
+
+    if (response.status >= 500) {
+      return { valid: true, grace: true };
+    }
 
     const data = await response.json();
 
