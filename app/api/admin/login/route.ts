@@ -12,7 +12,7 @@ function sha256(value: string): Buffer {
 export async function POST(request: Request) {
   // Brute-force protection: max 5 attempts per IP per 15 minutes
   const ip = getClientIp(request);
-  const rl = rateLimit(`login:${ip}`, 5, 15 * 60 * 1000);
+  const rl = await rateLimit(`login:${ip}`, 5, 15 * 60 * 1000);
   if (!rl.ok) {
     return NextResponse.json(
       { error: 'Too many login attempts. Please try again later.' },

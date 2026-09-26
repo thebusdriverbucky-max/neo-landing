@@ -1,78 +1,8 @@
 import prisma from './prisma';
 import { Prisma } from '@prisma/client';
+import { defaultContent, type SiteContentData } from './default-content';
 
-const defaultContent = {
-  "meta": {
-    "siteName": "Business Name",
-    "siteDescription": "Your business description",
-    "siteUrl": "https://example.com",
-    "siteLang": "en",
-    "faviconUrl": "https://i.imgur.com/udCYp7c.png",
-    "ogImageUrl": "",
-    "logoText": "LOGO",
-    "logoImageUrl": "",
-    "copyright": "© 2025 Business Name. All rights reserved.",
-  },
-  "navbar": {
-    "logo": "LOGO",
-    "links": ["About", "Services", "Gallery", "Contact"]
-  },
-  "hero": {
-    "title": "Welcome to Our Business",
-    "subtitle": "Professional service you can trust",
-    "buttonText": "Book Now",
-    "backgroundImage": ""
-  },
-  "about": {
-    "title": "About Us",
-    "text": "We are a professional team...",
-    "image": "",
-    "stats": [
-      { "value": "10+", "label": "Years Experience" },
-      { "value": "500+", "label": "Happy Clients" },
-      { "value": "100%", "label": "Satisfaction" }
-    ]
-  },
-  "services": {
-    "title": "Our Services",
-    "items": [
-      { "title": "Service 1", "description": "Description", "icon": "⭐" },
-      { "title": "Service 2", "description": "Description", "icon": "🔥" },
-      { "title": "Service 3", "description": "Description", "icon": "💎" }
-    ]
-  },
-  "gallery": {
-    "title": "Our Work",
-    "images": [] as string[]
-  },
-  "booking": {
-    "title": "Book Now",
-    "subtitle": "Fill the form and we'll contact you",
-    "showDateField": true,
-    "buttonText": "Send Request"
-  },
-  "contact": {
-    "title": "Contact Us",
-    "phone": "+1 234 567 890",
-    "email": "hello@business.com",
-    "address": "123 Street, City",
-    "workingHours": "Mon-Fri: 9:00 - 18:00",
-    "googleMapsUrl": "",
-    "whatsapp": "",
-    "instagram": "",
-    "facebook": ""
-  },
-  "legal": {
-    "privacyPolicy": "Privacy Policy\n\nWe respect your privacy and are committed to protecting your personal data. This privacy policy will inform you as to how we look after your personal data when you visit our website and tell you about your privacy rights and how the law protects you.",
-    "termsOfService": "Terms of Service\n\nThese terms and conditions outline the rules and regulations for the use of our Website. By accessing this website we assume you accept these terms and conditions. Do not continue to use the website if you do not agree to take all of the terms and conditions stated on this page.",
-    "cookiePolicy": "Cookie Policy\n\nWe use cookies to help improve your experience of our website. This cookie policy is part of our privacy policy, and covers the use of cookies between your device and our site. We also provide basic information on third-party services we may use, who may also use cookies as part of their service, though they are not covered by our policy."
-  },
-  "footer": {
-    "text": "© 2025 Business Name. All rights reserved."
-  }
-};
-
-export type SiteContentData = typeof defaultContent;
+export type { SiteContentData } from './default-content';
 
 type JsonObject = Record<string, unknown>;
 
@@ -101,19 +31,14 @@ function deepMerge(target: JsonObject, source: JsonObject): JsonObject {
 }
 
 export async function getSiteContent() {
-  const content = await prisma.siteContent.findUnique({
+  const content = await prisma.siteContent.upsert({
     where: { id: 1 },
+    update: {},
+    create: {
+      id: 1,
+      data: defaultContent,
+    },
   });
-
-  if (!content) {
-    const newContent = await prisma.siteContent.create({
-      data: {
-        id: 1,
-        data: defaultContent,
-      },
-    });
-    return newContent.data as unknown as SiteContentData;
-  }
 
   let data = content.data as unknown as SiteContentData;
 

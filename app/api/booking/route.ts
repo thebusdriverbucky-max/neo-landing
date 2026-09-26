@@ -1,29 +1,29 @@
 import { NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { Resend } from 'resend';
+import {
+  BookingInputError,
+  escapeHtml,
+  parseBookingInput,
+} from '@/lib/booking-input';
+import { getClientIp, rateLimit } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
+  const ip = getClientIp(request);
+  const requestLimit = await rateLimit(`booking:${ip}`, 5, 60 * 60 * 1000);
+  if (!requestLimit.ok) {
+    return NextResponse.json(
+      { error: 'Too many booking requests. Please try again later.' },
+      {
+        status: 429,
+        headers: { 'Retry-After': String(requestLimit.retryAfterSec || 60) },
+      },
+    );
+  }
+
   try {
     const body = await request.json();
-    const { name, phone, email, date, message } = body;
-
-    if (!name || !phone) {
-      return NextResponse.json({ error: 'Name and phone are required' }, { status: 400 });
-    }
-
-    // Server-side validation for character limits
-    if (name.length > 20) {
-      return NextResponse.json({ error: 'Name is too long (max 20 characters)' }, { status: 400 });
-    }
-    if (phone.length > 20) {
-      return NextResponse.json({ error: 'Phone is too long (max 20 characters)' }, { status: 400 });
-    }
-    if (email && email.length > 100) {
-      return NextResponse.json({ error: 'Email is too long (max 100 characters)' }, { status: 400 });
-    }
-    if (message && message.length > 500) {
-      return NextResponse.json({ error: 'Message is too long (max 500 characters)' }, { status: 400 });
-    }
+    const { name, phone, email, date, message } = parseBookingInput(body);
 
     // Rate limiting: check for existing bookings from same email or phone in last 10 minutes
     const tenMinutesAgo = new Date(Date.now() - 10 * 60 * 1000);
@@ -66,6 +66,14 @@ export async function POST(request: Request) {
       } else {
         try {
           const resend = new Resend(resendApiKey);
+          const safeName = escapeHtml(name);
+          const safePhone = escapeHtml(phone);
+          const safeEmail = email ? escapeHtml(email) : null;
+          const safeDate = date ? escapeHtml(date) : null;
+          const safeMessage = message ? escapeHtml(message) : null;
+          const adminUrl = process.env.NEXT_PUBLIC_APP_URL
+            ? `${process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, '')}/admin`
+            : null;
           await resend.emails.send({
             from: process.env.EMAIL_FROM || 'onboarding@resend.dev',
             to: adminEmail,
@@ -81,31 +89,32 @@ export async function POST(request: Request) {
                   <table style="width: 100%; border-collapse: collapse;">
                     <tr>
                       <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; width: 100px; font-weight: 600; color: #666;">Name:</td>
-                      <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-weight: 500;">${name}</td>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-weight: 500;">${safeName}</td>
                     </tr>
                     <tr>
                       <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-weight: 600; color: #666;">Phone:</td>
-                      <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0;"><a href="tel:${phone}" style="color: #1a1a1a; text-decoration: none; font-weight: 500;">${phone}</a></td>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0;"><a href="tel:${safePhone}" style="color: #1a1a1a; text-decoration: none; font-weight: 500;">${safePhone}</a></td>
                     </tr>
                     <tr>
                       <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-weight: 600; color: #666;">Email:</td>
-                      <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0;">${email ? `<a href="mailto:${email}" style="color: #1a1a1a; text-decoration: none; font-weight: 500;">${email}</a>` : '<span style="color: #999;">Not provided</span>'}</td>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0;">${safeEmail ? `<a href="mailto:${safeEmail}" style="color: #1a1a1a; text-decoration: none; font-weight: 500;">${safeEmail}</a>` : '<span style="color: #999;">Not provided</span>'}</td>
                     </tr>
                     <tr>
                       <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-weight: 600; color: #666;">Date:</td>
-                      <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-weight: 500;">${date || '<span style="color: #999;">Not specified</span>'}</td>
+                      <td style="padding: 12px 0; border-bottom: 1px solid #f0f0f0; font-weight: 500;">${safeDate || '<span style="color: #999;">Not specified</span>'}</td>
                     </tr>
                   </table>
                 </div>
                 
                 <div style="margin-top: 32px;">
                   <p style="margin: 0 0 12px 0; font-size: 12px; color: #888888; text-transform: uppercase; font-weight: bold; letter-spacing: 0.5px;">Message</p>
-                  <div style="background-color: #f8f8f8; padding: 20px; border-radius: 6px; line-height: 1.6; color: #333333; white-space: pre-wrap; border: 1px solid #eeeeee;">${message || 'No message provided.'}</div>
+                  <div style="background-color: #f8f8f8; padding: 20px; border-radius: 6px; line-height: 1.6; color: #333333; white-space: pre-wrap; border: 1px solid #eeeeee;">${safeMessage || 'No message provided.'}</div>
                 </div>
-                
-                <div style="margin-top: 40px; text-align: center;">
-                  <a href="${process.env.NEXT_PUBLIC_APP_URL || ''}/admin" style="display: inline-block; background-color: #1a1a1a; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px;">Open Admin Panel</a>
-                </div>
+                ${adminUrl ? `
+                  <div style="margin-top: 40px; text-align: center;">
+                    <a href="${escapeHtml(adminUrl)}" style="display: inline-block; background-color: #1a1a1a; color: #ffffff; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: bold; font-size: 14px;">Open Admin Panel</a>
+                  </div>
+                ` : ''}
               </div>
               <div style="background-color: #f4f4f4; padding: 16px; text-align: center; font-size: 11px; color: #999999; border-top: 1px solid #e0e0e0;">
                 This is an automated notification from your website.
@@ -120,8 +129,14 @@ export async function POST(request: Request) {
       }
     }
 
-    return NextResponse.json(booking);
+    return NextResponse.json({ id: booking.id, created: true }, { status: 201 });
   } catch (error) {
+    if (error instanceof BookingInputError || error instanceof SyntaxError) {
+      return NextResponse.json(
+        { error: error instanceof BookingInputError ? error.message : 'Invalid JSON body' },
+        { status: 400 },
+      );
+    }
     console.error('Booking error:', error);
     return NextResponse.json({ error: 'Failed to save booking' }, { status: 500 });
   }

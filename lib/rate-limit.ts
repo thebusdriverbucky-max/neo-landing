@@ -1,46 +1,92 @@
-/**
- * Simple in-memory rate limiter (per server instance).
- * Good enough for protecting the admin login endpoint on small deployments.
- */
+import { createHash } from 'node:crypto';
 
-type Bucket = { count: number; resetAt: number };
+type RateLimitResult = {
+  ok: boolean;
+  retryAfterSec?: number;
+  unavailable?: boolean;
+};
 
-const buckets = new Map<string, Bucket>();
+type UpstashPipelineItem = { result?: unknown; error?: string };
 
-export function rateLimit(
-  key: string,
-  limit: number,
-  windowMs: number
-): { ok: boolean; retryAfterSec?: number } {
-  const now = Date.now();
-  const bucket = buckets.get(key);
+const IP_PATTERN = /^[a-f0-9:.]+$/i;
 
-  if (!bucket || bucket.resetAt <= now) {
-    // Opportunistic cleanup of expired buckets to avoid unbounded growth
-    if (buckets.size > 1000) {
-      for (const [k, v] of buckets) {
-        if (v.resetAt <= now) buckets.delete(k);
-      }
-    }
-    buckets.set(key, { count: 1, resetAt: now + windowMs });
-    return { ok: true };
-  }
-
-  bucket.count += 1;
-
-  if (bucket.count > limit) {
-    return {
-      ok: false,
-      retryAfterSec: Math.max(1, Math.ceil((bucket.resetAt - now) / 1000)),
-    };
-  }
-
-  return { ok: true };
+/** Trust only the client-IP header managed by Vercel, never raw proxy headers. */
+export function getClientIp(request: Request): string {
+  const platformIp = request.headers
+    .get('x-vercel-forwarded-for')
+    ?.split(',')[0]
+    ?.trim();
+  return platformIp && IP_PATTERN.test(platformIp) ? platformIp : 'anonymous';
 }
 
-/** Best-effort client IP extraction from proxy headers. */
-export function getClientIp(request: Request): string {
-  const forwarded = request.headers.get('x-forwarded-for');
-  if (forwarded) return forwarded.split(',')[0].trim();
-  return request.headers.get('x-real-ip') || 'unknown';
+function limiterUnavailable(): RateLimitResult {
+  if (process.env.NODE_ENV === 'development') {
+    console.warn('Rate limiter unavailable; allowing request in development');
+    return { ok: true, unavailable: true };
+  }
+  return { ok: false, retryAfterSec: 60, unavailable: true };
+}
+
+function redisKey(key: string, windowMs: number): string {
+  const digest = createHash('sha256').update(key).digest('hex');
+  return `neo-landing:rate-limit:${windowMs}:${digest}`;
+}
+
+/**
+ * Distributed fixed-window limiter backed by the Upstash REST API. If neither
+ * Upstash variable is set, the deployment must provide the external WAF rules
+ * documented in README. Partial configuration and provider failures fail
+ * closed outside development.
+ */
+export async function rateLimit(
+  key: string,
+  limit: number,
+  windowMs: number,
+): Promise<RateLimitResult> {
+  const url = process.env.UPSTASH_REDIS_REST_URL?.replace(/\/$/, '');
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+
+  if (!url && !token) return { ok: true };
+  if (!url || !token) {
+    console.error('Rate limiter configuration is incomplete');
+    return limiterUnavailable();
+  }
+
+  try {
+    const bucketKey = redisKey(key, windowMs);
+    const response = await fetch(`${url}/pipeline`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify([
+        ['INCR', bucketKey],
+        ['PEXPIRE', bucketKey, windowMs, 'NX'],
+        ['PTTL', bucketKey],
+      ]),
+      cache: 'no-store',
+    });
+    if (!response.ok) throw new Error(`Upstash returned ${response.status}`);
+
+    const results = await response.json() as UpstashPipelineItem[];
+    if (!Array.isArray(results) || results.some((item) => item.error)) {
+      throw new Error('Invalid Upstash pipeline response');
+    }
+
+    const count = Number(results[0]?.result);
+    const ttlMs = Number(results[2]?.result);
+    if (!Number.isFinite(count) || !Number.isFinite(ttlMs) || ttlMs < 0) {
+      throw new Error('Invalid Upstash counter response');
+    }
+
+    return count <= limit
+      ? { ok: true }
+      : { ok: false, retryAfterSec: Math.max(1, Math.ceil(ttlMs / 1000)) };
+  } catch (error) {
+    console.error('Rate limiter unavailable', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+    });
+    return limiterUnavailable();
+  }
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import cloudinary from '@/lib/cloudinary';
 import { isAdmin } from '@/lib/auth';
+import { UploadPolicyError, assertAllowedImage } from '@/lib/upload-policy';
 
 export async function POST(request: Request) {
   if (!(await isAdmin())) {
@@ -9,12 +10,13 @@ export async function POST(request: Request) {
 
   try {
     const formData = await request.formData();
-    const file = formData.get('file') as File;
+    const file = formData.get('file');
 
-    if (!file) {
+    if (!(file instanceof File)) {
       return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
 
+    assertAllowedImage(file);
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
@@ -22,6 +24,8 @@ export async function POST(request: Request) {
       cloudinary.uploader.upload_stream(
         {
           folder: 'neo-landing',
+          resource_type: 'image',
+          allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
         },
         (error, result) => {
           if (error) reject(error);
@@ -32,6 +36,9 @@ export async function POST(request: Request) {
 
     return NextResponse.json(result);
   } catch (error) {
+    if (error instanceof UploadPolicyError) {
+      return NextResponse.json({ error: error.message }, { status: error.status });
+    }
     console.error('Upload error:', error);
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
   }

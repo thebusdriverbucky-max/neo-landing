@@ -1,0 +1,288 @@
+{
+  "schemaVersion": "1.0.0",
+  "template": {
+    "id": "neo-landing",
+    "name": "Neo Business Landing",
+    "release": {
+      "version": "0.1.0-candidate",
+      "tag": null,
+      "commit": null,
+      "status": "candidate"
+    },
+    "verifiedAt": "2026-09-26"
+  },
+  "runtime": {
+    "node": ">=22.0.0 <23",
+    "packageManager": "npm@10.8.2",
+    "database": "postgresql",
+    "capabilities": [
+      "database",
+      "password-admin",
+      "cloudinary-upload-optional",
+      "email-optional",
+      "distributed-rate-limit-optional"
+    ]
+  },
+  "environment": [
+    {
+      "name": "LICENSE_KEY",
+      "required": true,
+      "feature": "core",
+      "secret": true,
+      "scope": "server",
+      "valueGroup": null,
+      "description": "Buyer license key supplied after purchase.",
+      "providerDocsUrl": null,
+      "validation": { "type": "string", "minLength": 1 },
+      "defaultAvailable": false
+    },
+    {
+      "name": "LICENSE_SERVER_URL",
+      "required": true,
+      "feature": "core",
+      "secret": false,
+      "scope": "server",
+      "valueGroup": null,
+      "description": "License validation service origin supplied with the template.",
+      "providerDocsUrl": null,
+      "validation": { "type": "url", "protocols": ["https"] },
+      "defaultAvailable": false
+    },
+    {
+      "name": "LICENSE_SERVER_SECRET",
+      "required": false,
+      "feature": "license-local-verification",
+      "secret": true,
+      "scope": "server",
+      "valueGroup": null,
+      "description": "Optional shared secret for local license JWT verification; when absent, requests are validated against the license server.",
+      "providerDocsUrl": null,
+      "validation": { "type": "string", "minLength": 32 },
+      "defaultAvailable": false
+    },
+    {
+      "name": "LICENSE_PRODUCT",
+      "required": true,
+      "feature": "core",
+      "secret": false,
+      "scope": "server",
+      "valueGroup": null,
+      "description": "License product identifier for this template.",
+      "providerDocsUrl": null,
+      "validation": { "type": "literal", "value": "neo-landing" },
+      "defaultAvailable": true
+    },
+    {
+      "name": "DATABASE_URL",
+      "required": true,
+      "feature": "core",
+      "secret": true,
+      "scope": "server",
+      "valueGroup": "postgres-database",
+      "description": "Pooled PostgreSQL connection used by the application runtime.",
+      "providerDocsUrl": "https://neon.tech/docs/connect/connect-from-any-app",
+      "validation": { "type": "url", "protocols": ["postgresql", "postgres"] },
+      "defaultAvailable": false
+    },
+    {
+      "name": "DIRECT_URL",
+      "required": true,
+      "feature": "core",
+      "secret": true,
+      "scope": "server",
+      "valueGroup": "postgres-database",
+      "description": "Direct connection to the same database, branch, and schema for Prisma migrations.",
+      "providerDocsUrl": "https://neon.tech/docs/connect/connect-from-any-app",
+      "validation": { "type": "url", "protocols": ["postgresql", "postgres"] },
+      "defaultAvailable": false
+    },
+    {
+      "name": "ADMIN_PASSWORD",
+      "required": true,
+      "feature": "core",
+      "secret": true,
+      "scope": "server",
+      "valueGroup": null,
+      "description": "Password protecting the landing-page admin panel.",
+      "providerDocsUrl": null,
+      "validation": { "type": "string", "minLength": 12 },
+      "defaultAvailable": false
+    },
+    {
+      "name": "JWT_SECRET",
+      "required": true,
+      "feature": "core",
+      "secret": true,
+      "scope": "server",
+      "valueGroup": null,
+      "description": "Secret used to sign admin session tokens.",
+      "providerDocsUrl": null,
+      "validation": { "type": "string", "minLength": 32 },
+      "defaultAvailable": false
+    },
+    {
+      "name": "NEXT_PUBLIC_APP_URL",
+      "required": true,
+      "feature": "core",
+      "secret": false,
+      "scope": "client",
+      "valueGroup": "application-origin",
+      "description": "Canonical application origin used for links in booking notifications.",
+      "providerDocsUrl": null,
+      "validation": { "type": "origin", "httpsInProduction": true },
+      "defaultAvailable": false
+    },
+    {
+      "name": "NEXT_PUBLIC_SITE_URL",
+      "required": true,
+      "feature": "core",
+      "secret": false,
+      "scope": "client",
+      "valueGroup": "application-origin",
+      "description": "SEO and sitemap compatibility alias generated from NEXT_PUBLIC_APP_URL.",
+      "providerDocsUrl": null,
+      "validation": { "type": "origin", "httpsInProduction": true },
+      "defaultAvailable": false
+    },
+    {
+      "name": "CLOUDINARY_CLOUD_NAME",
+      "required": false,
+      "feature": "cloudinary-upload",
+      "secret": false,
+      "scope": "server",
+      "valueGroup": "cloudinary-private-upload",
+      "description": "Cloudinary cloud name used by the server-side admin upload route.",
+      "providerDocsUrl": "https://cloudinary.com/documentation/node_integration",
+      "validation": { "type": "string", "minLength": 1 },
+      "defaultAvailable": false
+    },
+    {
+      "name": "CLOUDINARY_API_KEY",
+      "required": false,
+      "feature": "cloudinary-upload",
+      "secret": true,
+      "scope": "server",
+      "valueGroup": "cloudinary-private-upload",
+      "description": "Private Cloudinary API key used only by the server-side admin upload route.",
+      "providerDocsUrl": "https://cloudinary.com/documentation/node_integration",
+      "validation": { "type": "string", "minLength": 1 },
+      "defaultAvailable": false
+    },
+    {
+      "name": "CLOUDINARY_API_SECRET",
+      "required": false,
+      "feature": "cloudinary-upload",
+      "secret": true,
+      "scope": "server",
+      "valueGroup": "cloudinary-private-upload",
+      "description": "Private Cloudinary API secret used only by the server-side admin upload route.",
+      "providerDocsUrl": "https://cloudinary.com/documentation/node_integration",
+      "validation": { "type": "string", "minLength": 1 },
+      "defaultAvailable": false
+    },
+    {
+      "name": "ADMIN_EMAIL",
+      "required": false,
+      "feature": "email",
+      "secret": false,
+      "scope": "server",
+      "valueGroup": "resend-email",
+      "description": "Recipient for optional booking notifications.",
+      "providerDocsUrl": null,
+      "validation": { "type": "email" },
+      "defaultAvailable": false
+    },
+    {
+      "name": "RESEND_API_KEY",
+      "required": false,
+      "feature": "email",
+      "secret": true,
+      "scope": "server",
+      "valueGroup": "resend-email",
+      "description": "Resend API key for optional booking notifications.",
+      "providerDocsUrl": "https://resend.com/docs/dashboard/api-keys/introduction",
+      "validation": { "type": "string", "prefixes": ["re_"] },
+      "defaultAvailable": false
+    },
+    {
+      "name": "EMAIL_FROM",
+      "required": false,
+      "feature": "email",
+      "secret": false,
+      "scope": "server",
+      "valueGroup": "resend-email",
+      "description": "Verified sender used when booking email delivery is enabled.",
+      "providerDocsUrl": "https://resend.com/docs/dashboard/domains/introduction",
+      "validation": { "type": "email-or-mailbox" },
+      "defaultAvailable": true
+    },
+    {
+      "name": "UPSTASH_REDIS_REST_URL",
+      "required": false,
+      "feature": "upstash-rate-limit",
+      "secret": false,
+      "scope": "server",
+      "valueGroup": "upstash-rate-limit",
+      "description": "Optional Upstash REST URL; configure with the token or protect admin login and booking routes using hosting WAF rules.",
+      "providerDocsUrl": "https://upstash.com/docs/redis/overall/getstarted",
+      "validation": { "type": "url", "protocols": ["https"] },
+      "defaultAvailable": false
+    },
+    {
+      "name": "UPSTASH_REDIS_REST_TOKEN",
+      "required": false,
+      "feature": "upstash-rate-limit",
+      "secret": true,
+      "scope": "server",
+      "valueGroup": "upstash-rate-limit",
+      "description": "Optional Upstash REST token paired with UPSTASH_REDIS_REST_URL.",
+      "providerDocsUrl": "https://upstash.com/docs/redis/overall/getstarted",
+      "validation": { "type": "string", "minLength": 1 },
+      "defaultAvailable": false
+    }
+  ],
+  "aliases": [
+    {
+      "canonical": "NEXT_PUBLIC_APP_URL",
+      "aliases": ["NEXT_PUBLIC_SITE_URL"],
+      "policy": "Generate both current runtime names from one buyer-supplied origin until metadata consumers are migrated to the canonical name."
+    }
+  ],
+  "featureRequirements": [
+    {
+      "feature": "cloudinary-upload",
+      "allOf": [
+        "CLOUDINARY_CLOUD_NAME",
+        "CLOUDINARY_API_KEY",
+        "CLOUDINARY_API_SECRET"
+      ]
+    },
+    {
+      "feature": "email",
+      "allOf": ["ADMIN_EMAIL", "RESEND_API_KEY", "EMAIL_FROM"]
+    },
+    {
+      "feature": "upstash-rate-limit",
+      "allOf": ["UPSTASH_REDIS_REST_URL", "UPSTASH_REDIS_REST_TOKEN"],
+      "alternative": "Equivalent hosting WAF rules for /api/admin/login and /api/booking."
+    }
+  ],
+  "build": {
+    "command": "npm run build",
+    "steps": [
+      "prisma generate",
+      "prisma migrate deploy",
+      "npm run db:bootstrap",
+      "next build"
+    ],
+    "bootstrap": {
+      "command": "npm run db:bootstrap",
+      "idempotent": true,
+      "preservesOwnerData": true,
+      "requiresAdminSession": false
+    },
+    "destructiveReset": null
+  },
+  "payments": null,
+  "releaseNotes": "README.md"
+}
