@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getSiteContent, updateSiteContent } from '@/lib/content';
 import { isAdmin } from '@/lib/auth';
 import { revalidatePath } from 'next/cache';
+import { ContentValidationError } from '@/lib/content-contract';
 
 export async function GET() {
   if (!(await isAdmin())) {
@@ -23,15 +24,22 @@ export async function PATCH(request: Request) {
   }
 
   try {
-    const { section, data } = await request.json();
-    if (!section || !data) {
+    const payload = await request.json();
+    if (!payload || typeof payload !== 'object' || Array.isArray(payload)) {
+      return NextResponse.json({ error: 'Missing section or data' }, { status: 400 });
+    }
+    const { section, data } = payload as { section?: unknown; data?: unknown };
+    if (!section || data === undefined) {
       return NextResponse.json({ error: 'Missing section or data' }, { status: 400 });
     }
 
     const updatedContent = await updateSiteContent(section, data);
     revalidatePath('/');
     return NextResponse.json(updatedContent);
-  } catch {
+  } catch (error) {
+    if (error instanceof ContentValidationError) {
+      return NextResponse.json({ error: error.message }, { status: 400 });
+    }
     return NextResponse.json({ error: 'Failed to update content' }, { status: 500 });
   }
 }

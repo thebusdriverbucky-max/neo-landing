@@ -24,12 +24,14 @@ export default function About({ content }: AboutProps) {
           transition={{ duration: 0.8 }}
           className="relative h-[500px] md:h-[600px] rounded-2xl overflow-hidden shadow-2xl"
         >
-          <Image
-            src={content.image || "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80"}
-            alt={content.title}
-            fill
-            className="object-cover"
-          />
+          {content.image && (
+            <Image
+              src={content.image}
+              alt={content.title}
+              fill
+              className="object-cover"
+            />
+          )}
           <div className="absolute inset-0 border-[20px] border-white/10 pointer-events-none" />
         </motion.div>
 

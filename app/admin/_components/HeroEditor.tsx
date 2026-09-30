@@ -75,6 +75,9 @@ export default function HeroEditor({ initialData }: HeroEditorProps) {
             onChange={(url) => setData({ ...data, backgroundImage: url })}
             onRemove={() => setData({ ...data, backgroundImage: '' })}
           />
+          <p className="mt-2 text-sm text-neutral-400">
+            Your image replaces the neutral landscape. Removing it restores the built-in background.
+          </p>
         </div>
       </div>
 

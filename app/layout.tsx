@@ -18,10 +18,10 @@ export async function generateMetadata(): Promise<Metadata> {
   const content = await getSiteContent();
   const meta = content.meta || {};
 
-  const siteName = meta.siteName || "Neo Landing";
-  const siteDescription = meta.siteDescription || "Modern landing page template";
+  const siteName = meta.siteName || "";
+  const siteDescription = meta.siteDescription || "";
   const siteUrl = meta.siteUrl || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
-  const faviconUrl = meta.faviconUrl || "https://i.imgur.com/udCYp7c.png";
+  const faviconUrl = meta.faviconUrl || "";
   const ogImageUrl = meta.ogImageUrl || "";
 
   return {
@@ -31,9 +31,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: siteDescription,
     metadataBase: new URL(siteUrl),
-    icons: {
-      icon: faviconUrl,
-    },
+    ...(faviconUrl ? { icons: { icon: faviconUrl } } : {}),
     openGraph: {
       title: siteName,
       description: siteDescription,

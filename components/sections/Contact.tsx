@@ -19,11 +19,11 @@ interface ContactProps {
 
 export default function Contact({ content }: ContactProps) {
   const contactItems = [
-    { icon: <Phone className="w-6 h-6" />, label: "Phone", value: content.phone, href: `tel:${content.phone}` },
-    { icon: <Mail className="w-6 h-6" />, label: "Email", value: content.email, href: `mailto:${content.email}` },
-    { icon: <MapPin className="w-6 h-6" />, label: "Address", value: content.address, href: content.googleMapsUrl || "#" },
+    { icon: <Phone className="w-6 h-6" />, label: "Phone", value: content.phone, href: content.phone ? `tel:${content.phone}` : null },
+    { icon: <Mail className="w-6 h-6" />, label: "Email", value: content.email, href: content.email ? `mailto:${content.email}` : null },
+    { icon: <MapPin className="w-6 h-6" />, label: "Address", value: content.address, href: content.googleMapsUrl || null },
     { icon: <Clock className="w-6 h-6" />, label: "Working Hours", value: content.workingHours, href: null },
-  ];
+  ].filter(item => item.value);
 
   const socialLinks = [
     { icon: <MessageCircle className="w-6 h-6" />, href: content.whatsapp, label: "WhatsApp" },
@@ -67,9 +67,7 @@ export default function Contact({ content }: ContactProps) {
               <div className="w-12 h-12 rounded-full bg-secondary/10 flex items-center justify-center text-secondary mb-6">
                 {item.icon}
               </div>
-              <h3 className="text-xs uppercase tracking-widest font-bold text-foreground/40 mb-2">
-                {item.label}
-              </h3>
+            <h3 className="text-xs uppercase tracking-widest font-bold text-foreground/40 mb-2">{item.label}</h3>
               {item.href ? (
                 <a href={item.href} className="text-lg font-medium text-primary hover:text-secondary transition-colors">
                   {item.value}

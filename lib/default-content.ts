@@ -11,14 +11,13 @@ export const defaultContent = {
     copyright: "© 2025 Business Name. All rights reserved.",
   },
   navbar: {
-    logo: "LOGO",
     links: ["About", "Services", "Gallery", "Contact"],
   },
   hero: {
     title: "Welcome to Our Business",
     subtitle: "Professional service you can trust",
     buttonText: "Book Now",
-    backgroundImage: "",
+    backgroundImage: "/images/hero-neutral.svg",
   },
   about: {
     title: "About Us",
@@ -66,9 +65,6 @@ export const defaultContent = {
       "Terms of Service\n\nReplace this starter text with terms reviewed for your services, booking process, cancellations, payments, and jurisdiction before launch.",
     cookiePolicy:
       "Cookie Policy\n\nReplace this starter text with a cookie policy that reflects the analytics, embeds, authentication, and other services enabled on your deployment.",
-  },
-  footer: {
-    text: "© 2025 Business Name. All rights reserved.",
   },
 };
 

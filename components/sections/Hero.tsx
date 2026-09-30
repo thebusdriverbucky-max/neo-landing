@@ -14,18 +14,38 @@ interface HeroProps {
 
 export default function Hero({ content }: HeroProps) {
   return (
-    <section className="relative w-full min-h-[calc(100vh-72px)] mt-[72px] md:min-h-screen md:mt-0 flex items-center justify-center overflow-hidden">
+    <section
+      className="relative w-full min-h-[calc(100vh-72px)] mt-[72px] md:min-h-screen md:mt-0 flex items-center justify-center overflow-hidden bg-cover bg-center"
+      style={{ backgroundImage: 'url(/images/hero-neutral.svg)' }}
+    >
       {/* Background Image with Overlay */}
       <div
         className="absolute inset-0 z-0"
         style={{
-          backgroundImage: `url(${content.backgroundImage || 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&q=80'})`,
+          backgroundImage: content.backgroundImage ? `url(${content.backgroundImage})` : undefined,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       >
         <div className="absolute inset-0 bg-black/40" />
       </div>
+
+      {/* Scroll Indicator */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1, duration: 1 }}
+        className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white flex flex-col items-center gap-2"
+      >
+        <span className="text-[10px] uppercase tracking-[0.3em]">Scroll</span>
+        <div className="w-[1px] h-12 bg-white/30 relative overflow-hidden">
+          <motion.div
+            animate={{ y: [0, 48] }}
+            transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+            className="absolute top-0 left-0 w-full h-1/3 bg-secondary"
+          />
+        </div>
+      </motion.div>
 
       <div className="container-custom relative z-10 text-center text-white px-6">
         <motion.h1
@@ -60,22 +80,6 @@ export default function Hero({ content }: HeroProps) {
         </motion.div>
       </div>
 
-      {/* Scroll Indicator */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1, duration: 1 }}
-        className="absolute bottom-10 left-1/2 -translate-x-1/2 text-white flex flex-col items-center gap-2"
-      >
-        <span className="text-[10px] uppercase tracking-[0.3em]">Scroll</span>
-        <div className="w-[1px] h-12 bg-white/30 relative overflow-hidden">
-          <motion.div
-            animate={{ y: [0, 48] }}
-            transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-            className="absolute top-0 left-0 w-full h-1/3 bg-secondary"
-          />
-        </div>
-      </motion.div>
     </section>
   );
 }

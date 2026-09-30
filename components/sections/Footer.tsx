@@ -8,8 +8,6 @@ interface FooterProps {
 }
 
 export default function Footer({ copyright }: FooterProps) {
-  const defaultCopyright = `© ${new Date().getFullYear()} Business Name. All rights reserved.`;
-
   return (
     <footer className="py-12 bg-primary text-white/60 border-t border-white/5">
       <motion.div
@@ -19,7 +17,7 @@ export default function Footer({ copyright }: FooterProps) {
         className="container-custom flex flex-col md:flex-row items-center justify-between gap-8"
       >
         <div className="text-sm tracking-widest uppercase">
-          {copyright || defaultCopyright}
+          {copyright}
         </div>
 
         <div className="flex gap-8 text-[10px] uppercase tracking-[0.2em]">

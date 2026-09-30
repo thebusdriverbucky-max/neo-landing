@@ -6,6 +6,7 @@ import { LogOut, LayoutDashboard, Settings, Image as ImageIcon, Briefcase, Info,
 
 const navItems = [
   { name: 'General', href: '#meta', icon: Settings },
+  { name: 'Navigation', href: '#navbar', icon: Menu },
   { name: 'Hero', href: '#hero', icon: LayoutDashboard },
   { name: 'About Us', href: '#about', icon: Info },
   { name: 'Services', href: '#services', icon: Briefcase },

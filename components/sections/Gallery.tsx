@@ -11,16 +11,6 @@ interface GalleryProps {
 }
 
 export default function Gallery({ content }: GalleryProps) {
-  // Fallback images if none provided
-  const displayImages = content.images.length > 0 ? content.images : [
-    "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1504674900247-0877df9cc836?auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1559339352-11d035aa65de?auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1551024709-8f23befc6f87?auto=format&fit=crop&q=80",
-  ];
-
   return (
     <section id="gallery" className="section-padding bg-background">
       <div className="container-custom">
@@ -34,7 +24,7 @@ export default function Gallery({ content }: GalleryProps) {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {displayImages.map((img, index) => (
+          {content.images.map((img, index) => (
             <motion.div
               key={index}
               initial={{ opacity: 0, scale: 0.9 }}

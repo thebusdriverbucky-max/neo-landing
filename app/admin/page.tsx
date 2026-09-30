@@ -1,6 +1,7 @@
 import { getSiteContent } from '@/lib/content';
 import AdminNav from './_components/AdminNav';
 import MetaEditor from './_components/MetaEditor';
+import NavbarEditor from './_components/NavbarEditor';
 import HeroEditor from './_components/HeroEditor';
 import AboutEditor from './_components/AboutEditor';
 import ServicesEditor from './_components/ServicesEditor';
@@ -45,6 +46,7 @@ export default async function AdminPage() {
           </div>
 
           <MetaEditor initialData={content.meta} />
+          <NavbarEditor initialData={content.navbar} />
           <HeroEditor initialData={content.hero} />
           <AboutEditor initialData={content.about} />
           <ServicesEditor initialData={content.services} />

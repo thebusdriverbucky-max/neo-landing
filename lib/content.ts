@@ -1,34 +1,13 @@
 import prisma from './prisma';
 import { Prisma } from '@prisma/client';
 import { defaultContent, type SiteContentData } from './default-content';
+import {
+  mergeContentDefaults,
+  validateContentUpdate,
+  type JsonObject,
+} from './content-contract';
 
 export type { SiteContentData } from './default-content';
-
-type JsonObject = Record<string, unknown>;
-
-function isObject(item: unknown): item is JsonObject {
-  return Boolean(item) && typeof item === 'object' && !Array.isArray(item);
-}
-
-function deepMerge(target: JsonObject, source: JsonObject): JsonObject {
-  const output: JsonObject = { ...target };
-  if (isObject(target) && isObject(source)) {
-    Object.keys(source).forEach(key => {
-      const sourceValue = source[key];
-      if (isObject(sourceValue)) {
-        if (!(key in target))
-          Object.assign(output, { [key]: sourceValue });
-        else
-          output[key] = deepMerge(target[key] as JsonObject, sourceValue);
-      } else {
-        if (sourceValue !== undefined && sourceValue !== null && sourceValue !== '') {
-          Object.assign(output, { [key]: sourceValue });
-        }
-      }
-    });
-  }
-  return output;
-}
 
 export async function getSiteContent() {
   const content = await prisma.siteContent.upsert({
@@ -43,55 +22,61 @@ export async function getSiteContent() {
   let data = content.data as unknown as SiteContentData;
 
   // Merge with default content to ensure all fields exist
-  data = deepMerge(defaultContent, data) as unknown as SiteContentData;
+  data = mergeContentDefaults(defaultContent, data);
 
   // Ensure meta exists and merge fields from columns if available
   if (data.meta) {
-    if (content.copyright) data.meta.copyright = content.copyright;
-    if (content.siteName) data.meta.siteName = content.siteName;
-    if (content.siteDescription) data.meta.siteDescription = content.siteDescription;
-    if (content.siteUrl) data.meta.siteUrl = content.siteUrl;
-    if (content.siteLang) data.meta.siteLang = content.siteLang;
-    if (content.faviconUrl) data.meta.faviconUrl = content.faviconUrl;
-    if (content.ogImageUrl) data.meta.ogImageUrl = content.ogImageUrl;
+    if (content.copyright !== null && content.copyright !== undefined) data.meta.copyright = content.copyright;
+    if (content.siteName !== null && content.siteName !== undefined) data.meta.siteName = content.siteName;
+    if (content.siteDescription !== null && content.siteDescription !== undefined) data.meta.siteDescription = content.siteDescription;
+    if (content.siteUrl !== null && content.siteUrl !== undefined) data.meta.siteUrl = content.siteUrl;
+    if (content.siteLang !== null && content.siteLang !== undefined) data.meta.siteLang = content.siteLang;
+    if (content.faviconUrl !== null && content.faviconUrl !== undefined) data.meta.faviconUrl = content.faviconUrl;
+    if (content.ogImageUrl !== null && content.ogImageUrl !== undefined) data.meta.ogImageUrl = content.ogImageUrl;
   }
 
   return data;
 }
 
-export async function updateSiteContent(section: string, data: JsonObject) {
+export async function updateSiteContent(section: unknown, data: unknown) {
+  const validated = validateContentUpdate(section, data);
   const currentContent = await getSiteContent();
+  const currentSection = currentContent[validated.section] as unknown as JsonObject;
+  const updatedSection = {
+    ...currentSection,
+    ...validated.data,
+  };
 
   const updatedData = {
     ...currentContent,
-    [section]: data,
+    [validated.section]: updatedSection,
   };
 
   const content = await prisma.siteContent.update({
     where: { id: 1 },
     data: {
       data: updatedData as unknown as Prisma.InputJsonValue,
-      ...(section === 'meta' ? {
-        copyright: (data.copyright as string) || '',
-        siteName: (data.siteName as string) || '',
-        siteDescription: (data.siteDescription as string) || '',
-        siteUrl: (data.siteUrl as string) || '',
-        siteLang: (data.siteLang as string) || '',
-        faviconUrl: (data.faviconUrl as string) || '',
-        ogImageUrl: (data.ogImageUrl as string) || ''
+      ...(validated.section === 'meta' ? {
+        copyright: (updatedSection.copyright as string) || '',
+        siteName: (updatedSection.siteName as string) || '',
+        siteDescription: (updatedSection.siteDescription as string) || '',
+        siteUrl: (updatedSection.siteUrl as string) || '',
+        siteLang: (updatedSection.siteLang as string) || '',
+        faviconUrl: (updatedSection.faviconUrl as string) || '',
+        ogImageUrl: (updatedSection.ogImageUrl as string) || ''
       } : {}),
     },
   });
 
   const resultData = content.data as unknown as SiteContentData;
   if (resultData.meta) {
-    if (content.copyright) resultData.meta.copyright = content.copyright;
-    if (content.siteName) resultData.meta.siteName = content.siteName;
-    if (content.siteDescription) resultData.meta.siteDescription = content.siteDescription;
-    if (content.siteUrl) resultData.meta.siteUrl = content.siteUrl;
-    if (content.siteLang) resultData.meta.siteLang = content.siteLang;
-    if (content.faviconUrl) resultData.meta.faviconUrl = content.faviconUrl;
-    if (content.ogImageUrl) resultData.meta.ogImageUrl = content.ogImageUrl;
+    if (content.copyright !== null && content.copyright !== undefined) resultData.meta.copyright = content.copyright;
+    if (content.siteName !== null && content.siteName !== undefined) resultData.meta.siteName = content.siteName;
+    if (content.siteDescription !== null && content.siteDescription !== undefined) resultData.meta.siteDescription = content.siteDescription;
+    if (content.siteUrl !== null && content.siteUrl !== undefined) resultData.meta.siteUrl = content.siteUrl;
+    if (content.siteLang !== null && content.siteLang !== undefined) resultData.meta.siteLang = content.siteLang;
+    if (content.faviconUrl !== null && content.faviconUrl !== undefined) resultData.meta.faviconUrl = content.faviconUrl;
+    if (content.ogImageUrl !== null && content.ogImageUrl !== undefined) resultData.meta.ogImageUrl = content.ogImageUrl;
   }
 
   return resultData;

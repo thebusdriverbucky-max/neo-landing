@@ -116,6 +116,16 @@ export default function ContactEditor({ initialData }: ContactEditorProps) {
             onChange={(e) => setData({ ...data, instagram: e.target.value })}
           />
         </div>
+
+        <div>
+          <label className="block text-sm font-medium text-neutral-400 mb-2">Facebook</label>
+          <input
+            type="text"
+            className="w-full px-4 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-primary"
+            value={data.facebook}
+            onChange={(e) => setData({ ...data, facebook: e.target.value })}
+          />
+        </div>
       </div>
 
       <Button onClick={handleSave} disabled={loading}>

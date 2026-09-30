@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Button from '@/components/ui/Button';
 import ImageUpload from '@/components/ui/ImageUpload';
 import { Trash2 } from 'lucide-react';
+import Image from 'next/image';
 import type { SiteContentData } from '@/lib/content';
 
 interface GalleryEditorProps {
@@ -68,7 +69,13 @@ export default function GalleryEditor({ initialData }: GalleryEditorProps) {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {data.images.map((url, index) => (
               <div key={index} className="relative aspect-square rounded-xl overflow-hidden border border-neutral-700 group">
-                <img src={url} alt="" className="w-full h-full object-cover" />
+                <Image
+                  src={url}
+                  alt=""
+                  fill
+                  sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                  className="object-cover"
+                />
                 <button
                   onClick={() => removeImage(index)}
                   className="absolute top-2 right-2 p-1.5 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition shadow-lg"
