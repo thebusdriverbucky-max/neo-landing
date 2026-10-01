@@ -1,11 +1,20 @@
 import { NextResponse } from 'next/server';
-import cloudinary from '@/lib/cloudinary';
+import cloudinary, { isCloudinaryConfigured } from '@/lib/cloudinary';
 import { isAdmin } from '@/lib/auth';
 import { UploadPolicyError, assertAllowedImage } from '@/lib/upload-policy';
 
 export async function POST(request: Request) {
   if (!(await isAdmin())) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  if (!isCloudinaryConfigured) {
+    return NextResponse.json(
+      {
+        error: 'File upload is not configured. Add all three optional Cloudinary values or paste a hosted image URL in the editor.',
+      },
+      { status: 503 },
+    );
   }
 
   try {

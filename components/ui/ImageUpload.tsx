@@ -16,12 +16,14 @@ export default function ImageUpload({
   onRemove,
 }: ImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setIsUploading(true);
+    setUploadError("");
     const formData = new FormData();
     formData.append("file", file);
 
@@ -31,13 +33,19 @@ export default function ImageUpload({
         body: formData,
       });
       const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Upload failed");
+      }
       if (data.secure_url) {
         onChange(data.secure_url);
       } else if (data.url) {
         onChange(data.url);
+      } else {
+        throw new Error("The upload provider did not return an image URL");
       }
     } catch (error) {
       console.error("Upload failed:", error);
+      setUploadError(error instanceof Error ? error.message : "Upload failed");
     } finally {
       setIsUploading(false);
     }
@@ -45,6 +53,22 @@ export default function ImageUpload({
 
   return (
     <div className="space-y-4 w-full">
+      <div className="space-y-2">
+        <input
+          type="url"
+          value={value}
+          onChange={(event) => {
+            setUploadError("");
+            onChange(event.target.value);
+          }}
+          placeholder="https://example.com/image.jpg"
+          aria-label="Hosted image URL"
+          className="w-full rounded-lg border border-neutral-700 bg-neutral-900 px-3 py-2 text-sm text-white placeholder:text-neutral-500 focus:border-primary focus:outline-none"
+        />
+        <p className="text-xs text-neutral-500">
+          Paste a hosted image URL, or use the optional Cloudinary uploader below.
+        </p>
+      </div>
       <div className="flex items-center gap-4">
         {value ? (
           <div className="relative w-full max-w-[160px] aspect-square rounded-lg overflow-hidden border border-neutral-700 bg-neutral-800">
@@ -70,7 +94,7 @@ export default function ImageUpload({
               ) : (
                 <>
                   <Upload className="w-8 h-8 text-gray-400 mb-2" />
-                  <p className="text-xs text-gray-500">Click to upload</p>
+                  <p className="text-xs text-gray-500">Upload with Cloudinary</p>
                 </>
               )}
             </div>
@@ -84,6 +108,11 @@ export default function ImageUpload({
           </label>
         )}
       </div>
+      {uploadError && (
+        <p role="alert" className="text-sm text-amber-400">
+          {uploadError}
+        </p>
+      )}
     </div>
   );
 }
