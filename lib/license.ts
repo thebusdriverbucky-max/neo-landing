@@ -48,13 +48,15 @@ export async function verifyGraceToken(token: string): Promise<boolean> {
   }
 }
 
-// Fetch fresh validation from license server
-export async function fetchLicenseValidation(): Promise<{
+type LicenseValidation = {
   valid: boolean;
   token?: string;
   grace?: boolean;
   product?: string;
-}> {
+};
+
+// Fetch fresh validation from license server
+export async function fetchLicenseValidation(): Promise<LicenseValidation> {
   // No key configured = license required
   if (!LICENSE_KEY || !LICENSE_SERVER_URL) {
     return { valid: false };
@@ -68,7 +70,9 @@ export async function fetchLicenseValidation(): Promise<{
         key: LICENSE_KEY,
         product: LICENSE_PRODUCT
       }),
-      signal: AbortSignal.timeout(10000),
+      // A slow license server must not stall page loads: on timeout the
+      // visitor gets a grace period and the site keeps working.
+      signal: AbortSignal.timeout(3000),
     });
 
     if (response.status >= 500) {
@@ -87,4 +91,38 @@ export async function fetchLicenseValidation(): Promise<{
     // Server unreachable — grant grace period
     return { valid: true, grace: true };
   }
+}
+
+// Per-instance memo of the last license server answer. Visitors without a
+// license cookie (first visits, crawlers, link previews) would otherwise each
+// wait for their own round trip. Purely an optimization: a recycled instance
+// just asks the server again.
+const VALID_CACHE_MS = 60 * 60 * 1000;
+const GRACE_CACHE_MS = 5 * 60 * 1000;
+const INVALID_CACHE_MS = 60 * 1000;
+
+let cachedValidation: { result: LicenseValidation; expiresAt: number } | null = null;
+let pendingValidation: Promise<LicenseValidation> | null = null;
+
+export async function getLicenseValidation(): Promise<LicenseValidation> {
+  if (cachedValidation && cachedValidation.expiresAt > Date.now()) {
+    return cachedValidation.result;
+  }
+
+  if (!pendingValidation) {
+    pendingValidation = fetchLicenseValidation()
+      .then((result) => {
+        const ttl = !result.valid
+          ? INVALID_CACHE_MS
+          : result.token
+            ? VALID_CACHE_MS
+            : GRACE_CACHE_MS;
+        cachedValidation = { result, expiresAt: Date.now() + ttl };
+        return result;
+      })
+      .finally(() => {
+        pendingValidation = null;
+      });
+  }
+  return pendingValidation;
 }
