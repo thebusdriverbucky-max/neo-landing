@@ -74,7 +74,7 @@ export async function POST(request: Request) {
           const adminUrl = process.env.NEXT_PUBLIC_APP_URL
             ? `${process.env.NEXT_PUBLIC_APP_URL.replace(/\/$/, '')}/admin`
             : null;
-          await resend.emails.send({
+          const { error: sendError } = await resend.emails.send({
             from: process.env.EMAIL_FROM || 'onboarding@resend.dev',
             to: adminEmail,
             subject: `New Booking Request - ${name}`,
@@ -122,6 +122,11 @@ export async function POST(request: Request) {
             </div>
           `,
           });
+          // Resend reports API errors (unverified sender, bad key) in the
+          // result instead of throwing.
+          if (sendError) {
+            console.error('Failed to send email:', sendError);
+          }
         } catch (emailError) {
           console.error('Failed to send email:', emailError);
           // We don't return error here because the booking was already saved

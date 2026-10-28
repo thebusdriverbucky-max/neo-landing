@@ -15,6 +15,7 @@ interface BookingFormProps {
 
 export default function BookingForm({ content }: BookingFormProps) {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -30,9 +31,16 @@ export default function BookingForm({ content }: BookingFormProps) {
         body: JSON.stringify(data),
       });
 
-      if (res.ok) setStatus("success");
-      else setStatus("error");
+      if (res.ok) {
+        setStatus("success");
+        return;
+      }
+      // Validation (400) and rate-limit (429) responses explain what to fix.
+      const body = (await res.json().catch(() => null)) as { error?: string } | null;
+      setErrorMessage(res.status < 500 && body?.error ? body.error : "");
+      setStatus("error");
     } catch {
+      setErrorMessage("");
       setStatus("error");
     }
   };
@@ -81,7 +89,7 @@ export default function BookingForm({ content }: BookingFormProps) {
                     required
                     name="name"
                     type="text"
-                    maxLength={20}
+                    maxLength={100}
                     className="w-full px-6 py-4 rounded-xl border border-gray-200 focus:border-secondary focus:ring-1 focus:ring-secondary outline-none transition-all text-neutral-900"
                     placeholder="John Doe"
                   />
@@ -145,7 +153,7 @@ export default function BookingForm({ content }: BookingFormProps) {
                 </Button>
                 {status === "error" && (
                   <p className="text-red-500 text-sm mt-4 text-center">
-                    Something went wrong. Please try again.
+                    {errorMessage || "Something went wrong. Please try again."}
                   </p>
                 )}
               </div>

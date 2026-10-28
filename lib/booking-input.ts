@@ -55,7 +55,7 @@ export function parseBookingInput(value: unknown): BookingInput {
   }
 
   const body = value as Record<string, unknown>;
-  const name = requiredString(body.name, 'Name', 20);
+  const name = requiredString(body.name, 'Name', 100);
   const phone = requiredString(body.phone, 'Phone', 20);
   const email = optionalString(body.email, 'Email', 100)?.toLowerCase() || null;
   const date = optionalString(body.date, 'Date', 10);
