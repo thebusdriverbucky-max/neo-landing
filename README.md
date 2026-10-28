@@ -67,7 +67,8 @@ the optional Resend notification. Configure `ADMIN_EMAIL`, `RESEND_API_KEY`, and
 `EMAIL_FROM` together to enable those notifications; verify the sender/domain in
 Resend before relying on delivery.
 
-The admin upload route accepts JPEG, PNG, and WebP images up to 5 MiB. SVG and
+The admin upload route accepts JPEG, PNG, and WebP images up to 4 MiB (Vercel
+rejects function request bodies above 4.5 MB). SVG and
 other formats are rejected. Cloudinary credentials are server-only and must not
 use a `NEXT_PUBLIC_*` name.
 
@@ -77,9 +78,11 @@ Production must protect `/api/admin/login` and `/api/booking` with either:
 - external hosting/WAF rate-limit rules for those exact paths.
 
 When Upstash is configured, the application uses a distributed fixed-window
-counter and fails closed on incomplete configuration or provider failure outside
-development. Without Upstash, the application assumes the documented external
-WAF protection. Header-based identity trusts only Vercel's managed client-IP
+counter. If the Upstash configuration is incomplete or the provider fails, it
+falls back to a per-instance in-memory limit (weaker, but it never locks out
+visitors or the owner) and the admin panel shows a warning with the cause until
+Upstash responds again. Without Upstash, the application assumes the documented
+external WAF protection. Header-based identity trusts only Vercel's managed client-IP
 header, so non-Vercel hosting must provide an equivalent trusted-proxy contract
 or adapt the helper before commercial use. Add CAPTCHA/Turnstile to the booking
 form if the site's abuse profile requires stronger bot protection.
