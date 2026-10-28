@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { isOptimizableImage } from "@/lib/remote-images";
 
 interface GalleryProps {
   content: {
@@ -37,6 +38,7 @@ export default function Gallery({ content }: GalleryProps) {
                 src={img}
                 alt={`Gallery image ${index + 1}`}
                 fill
+                unoptimized={!isOptimizableImage(img)}
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
               />
               <div className="absolute inset-0 bg-black/20 group-hover:bg-black/0 transition-colors duration-300" />

@@ -1,29 +1,9 @@
 import type { NextConfig } from "next";
+import { OPTIMIZED_IMAGE_PATTERNS } from "./lib/remote-images";
 
 const nextConfig: NextConfig = {
   images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'images.unsplash.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'i.imgur.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'imgur.com',
-      },
-      {
-        protocol: 'https',
-        hostname: 'res.cloudinary.com',
-      },
-      {
-        protocol: 'http',
-        hostname: 'res.cloudinary.com',
-      }
-    ],
+    remotePatterns: OPTIMIZED_IMAGE_PATTERNS,
   },
 };
 

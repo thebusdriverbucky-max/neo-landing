@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { Upload, X } from "lucide-react";
 import Image from "next/image";
+import { isOptimizableImage } from "@/lib/remote-images";
+import { MAX_UPLOAD_BYTES } from "@/lib/upload-policy";
 
 interface ImageUploadProps {
   value: string;
@@ -20,7 +22,13 @@ export default function ImageUpload({
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = "";
     if (!file) return;
+
+    if (file.size > MAX_UPLOAD_BYTES) {
+      setUploadError("Image is too large (maximum 4 MiB)");
+      return;
+    }
 
     setIsUploading(true);
     setUploadError("");
@@ -32,13 +40,21 @@ export default function ImageUpload({
         method: "POST",
         body: formData,
       });
-      const data = await res.json();
+      // Platform errors (e.g. Vercel's 413 body limit) are not JSON.
+      const data = (await res.json().catch(() => null)) as {
+        error?: string;
+        secure_url?: string;
+        url?: string;
+      } | null;
       if (!res.ok) {
-        throw new Error(data.error || "Upload failed");
+        throw new Error(
+          data?.error ||
+            (res.status === 413 ? "Image is too large (maximum 4 MiB)" : "Upload failed"),
+        );
       }
-      if (data.secure_url) {
+      if (data?.secure_url) {
         onChange(data.secure_url);
-      } else if (data.url) {
+      } else if (data?.url) {
         onChange(data.url);
       } else {
         throw new Error("The upload provider did not return an image URL");
@@ -77,6 +93,7 @@ export default function ImageUpload({
               src={value}
               alt="Upload"
               className="object-cover"
+              unoptimized={!isOptimizableImage(value)}
             />
             <button
               onClick={onRemove}

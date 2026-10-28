@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { isOptimizableImage } from "@/lib/remote-images";
 
 interface AboutProps {
   content: {
@@ -29,6 +30,7 @@ export default function About({ content }: AboutProps) {
               src={content.image}
               alt={content.title}
               fill
+              unoptimized={!isOptimizableImage(content.image)}
               className="object-cover"
             />
           )}

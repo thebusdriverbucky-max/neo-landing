@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { isOptimizableImage } from "@/lib/remote-images";
 
 interface NavbarProps {
   content: {
@@ -42,6 +43,7 @@ export default function Navbar({ content }: NavbarProps) {
                 src={content.logoImageUrl}
                 alt="Logo"
                 fill
+                unoptimized={!isOptimizableImage(content.logoImageUrl)}
                 className="object-contain object-left"
                 priority
               />

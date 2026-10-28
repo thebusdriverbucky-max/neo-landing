@@ -5,6 +5,7 @@ import Button from '@/components/ui/Button';
 import ImageUpload from '@/components/ui/ImageUpload';
 import { Trash2 } from 'lucide-react';
 import Image from 'next/image';
+import { isOptimizableImage } from '@/lib/remote-images';
 import type { SiteContentData } from '@/lib/content';
 
 interface GalleryEditorProps {
@@ -73,6 +74,7 @@ export default function GalleryEditor({ initialData }: GalleryEditorProps) {
                   src={url}
                   alt=""
                   fill
+                  unoptimized={!isOptimizableImage(url)}
                   sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                   className="object-cover"
                 />
