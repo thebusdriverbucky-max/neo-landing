@@ -2,7 +2,7 @@ import { getSiteContent } from "@/lib/content";
 import Link from "next/link";
 import Footer from "@/components/sections/Footer";
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 3600;
 
 export default async function PrivacyPolicyPage() {
   const content = await getSiteContent();

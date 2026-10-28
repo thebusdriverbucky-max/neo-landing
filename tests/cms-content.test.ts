@@ -128,7 +128,7 @@ test('content update merges a partial section without dropping sibling fields', 
     ogImageUrl: defaultContent.meta.ogImageUrl,
   };
   const siteContent = {
-    upsert: async () => current,
+    findUnique: async () => current,
     update: async ({ data }: { data: Record<string, unknown> }) => {
       writes.push(data);
       return { ...current, ...data };
@@ -162,7 +162,7 @@ test('explicitly cleared meta columns remain cleared in the public content', asy
       Prisma: {},
       PrismaClient: class {
         siteContent = {
-          upsert: async () => ({
+          findUnique: async () => ({
             id: 1,
             data: {
               ...defaultContent,

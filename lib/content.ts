@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import prisma from './prisma';
 import { Prisma } from '@prisma/client';
 import { defaultContent, type SiteContentData } from './default-content';
@@ -9,15 +10,18 @@ import {
 
 export type { SiteContentData } from './default-content';
 
-export async function getSiteContent() {
-  const content = await prisma.siteContent.upsert({
-    where: { id: 1 },
-    update: {},
-    create: {
-      id: 1,
-      data: defaultContent,
-    },
-  });
+async function readSiteContent() {
+  // Plain read on the hot path; the upsert only runs once, on an empty table.
+  const content =
+    (await prisma.siteContent.findUnique({ where: { id: 1 } })) ??
+    (await prisma.siteContent.upsert({
+      where: { id: 1 },
+      update: {},
+      create: {
+        id: 1,
+        data: defaultContent,
+      },
+    }));
 
   let data = content.data as unknown as SiteContentData;
 
@@ -37,6 +41,9 @@ export async function getSiteContent() {
 
   return data;
 }
+
+// One query per request: generateMetadata, the root layout and the page share it.
+export const getSiteContent = cache(readSiteContent);
 
 export async function updateSiteContent(section: unknown, data: unknown) {
   const validated = validateContentUpdate(section, data);

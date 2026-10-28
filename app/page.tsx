@@ -8,7 +8,11 @@ import BookingForm from "@/components/sections/BookingForm";
 import Contact from "@/components/sections/Contact";
 import Footer from "@/components/sections/Footer";
 
-export const dynamic = 'force-dynamic';
+// Static page, regenerated when the admin saves content (see
+// app/api/admin/content). The hourly window only picks up edits made directly
+// in the database. If the database is down during regeneration, the last good
+// page keeps being served.
+export const revalidate = 3600;
 
 export default async function Home() {
   const content = await getSiteContent();

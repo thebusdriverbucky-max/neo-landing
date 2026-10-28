@@ -34,7 +34,9 @@ export async function PATCH(request: Request) {
     }
 
     const updatedContent = await updateSiteContent(section, data);
-    revalidatePath('/');
+    // Meta lives in the root layout and the sitemap, so refresh every page.
+    revalidatePath('/', 'layout');
+    revalidatePath('/sitemap.xml');
     return NextResponse.json(updatedContent);
   } catch (error) {
     if (error instanceof ContentValidationError) {
